@@ -4,6 +4,6 @@
 
 int main(int argc, char const *argv[])
 {
-    printf("Hello World\n");
+    printf("Checkers Game!\n\n");
     return 0;
 }
