@@ -1,0 +1,17 @@
+{
+    "C_Cpp.errorSquiggles": "Disabled",
+    "files.associations": {
+        "cstdio": "c",
+        "iostream": "cpp",
+        "stdexcept": "cpp",
+        "ostream": "cpp",
+        "random": "cpp",
+        "typeindex": "cpp",
+        "typeinfo": "cpp",
+        "string": "c",
+        "bitset": "c",
+        "chrono": "c",
+        "algorithm": "c",
+        "*.tcc": "cpp"
+    }
+}
