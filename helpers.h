@@ -19,6 +19,11 @@ void yellow()
     printf("\033%s", YELLOW);
 }
 
+void orange()
+{
+    printf("\033%s", ORANGE);
+}
+
 void reset()
 {
     printf("\033%s", REGULAR);

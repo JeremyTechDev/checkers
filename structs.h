@@ -35,8 +35,9 @@ typedef struct Coord
 
 typedef struct CoordList
 {
-    Coord *moves;
-    int moveCount;
+    Coord coord;
+    struct CoordList *next;
+    struct CoordList *prev;
 } CoordList;
 
 Board board = {
