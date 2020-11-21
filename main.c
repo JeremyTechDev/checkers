@@ -19,12 +19,12 @@ int main(int argc, char const *argv[])
         printBoard(pieceList);
 
         printColorText("\nChoose the piece you want to move: ", BLUE);
-        Move pieceChoice = getCordsFromUser();
+        Coord pieceChoice = getCordsFromUser();
         Piece *pieceToMove = getPieceAtPosition(pieceList, pieceChoice.x, pieceChoice.y);
 
         if (pieceToMove)
         {
-            MoveList possibleMoves = getPossibleMoves(pieceList, *pieceToMove);
+            CoordList possibleMoves = getPossibleMoves(pieceList, *pieceToMove);
 
             if (possibleMoves.moveCount)
             {

@@ -5,14 +5,14 @@
 #include "structs.h"
 #include "piece.h"
 
-MoveList getPossibleMoves(PieceList *, Piece);
-int isMovePossible(PieceList *, Move);
-Move getCordsFromUser();
+CoordList getPossibleMoves(PieceList *, Piece);
+int isMovePossible(PieceList *, Coord);
+Coord getCordsFromUser();
 
 /**
  * Gets a valid [x,y] cord from the user 
  */
-Move getCordsFromUser()
+Coord getCordsFromUser()
 {
     int xCord, yCord;
     char input[10];
@@ -32,14 +32,14 @@ Move getCordsFromUser()
             break;
     }
 
-    Move move = {xCord, yCord};
-    return move;
+    Coord coord = {xCord, yCord};
+    return coord;
 }
 
 /**
  * Returns whether a move is possible or not
  */
-int isMovePossible(PieceList *pieceList, Move move)
+int isMovePossible(PieceList *pieceList, Coord move)
 {
     if (move.x > 7 || move.x < 0)
         return 0;
@@ -57,25 +57,25 @@ int isMovePossible(PieceList *pieceList, Move move)
 /**
  * Returns all the posible moves for a piece
  */
-MoveList getPossibleMoves(PieceList *pieceList, Piece piece)
+CoordList getPossibleMoves(PieceList *pieceList, Piece piece)
 {
-    MoveList possibleMoves;
+    CoordList possibleMoves;
     possibleMoves.moveCount = 0;
-    possibleMoves.moves = (Move *)malloc(sizeof(Move));
+    possibleMoves.moves = (Coord *)malloc(sizeof(Coord));
 
-    Move posMove1 = {piece.x + (piece.team == black ? -1 : 1), piece.y + 1};
-    Move posMove2 = {piece.x + (piece.team == black ? -1 : 1), piece.y - 1};
+    Coord posMove1 = {piece.x + (piece.team == black ? -1 : 1), piece.y + 1};
+    Coord posMove2 = {piece.x + (piece.team == black ? -1 : 1), piece.y - 1};
 
     if (isMovePossible(pieceList, posMove1))
     {
-        possibleMoves.moves = (Move *)realloc(possibleMoves.moves, sizeof(Move) * (possibleMoves.moveCount + 1));
+        possibleMoves.moves = (Coord *)realloc(possibleMoves.moves, sizeof(Coord) * (possibleMoves.moveCount + 1));
         *(possibleMoves.moves + possibleMoves.moveCount) = posMove1;
         possibleMoves.moveCount++;
     }
 
     if (isMovePossible(pieceList, posMove2))
     {
-        possibleMoves.moves = (Move *)realloc(possibleMoves.moves, sizeof(Move) * (possibleMoves.moveCount + 1));
+        possibleMoves.moves = (Coord *)realloc(possibleMoves.moves, sizeof(Coord) * (possibleMoves.moveCount + 1));
         *(possibleMoves.moves + possibleMoves.moveCount) = posMove2;
         possibleMoves.moveCount++;
     }

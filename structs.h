@@ -27,17 +27,17 @@ typedef struct PieceList
     struct PieceList *prev;
 } PieceList;
 
-typedef struct Move
+typedef struct Coord
 {
     int x;
     int y;
-} Move;
+} Coord;
 
-typedef struct MoveList
+typedef struct CoordList
 {
-    Move *moves;
+    Coord *moves;
     int moveCount;
-} MoveList;
+} CoordList;
 
 Board board = {
     {"( )", "[ ]", "( )", "[ ]", "( )", "[ ]", "( )", "[ ]"},
