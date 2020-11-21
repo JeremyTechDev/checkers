@@ -10,6 +10,7 @@ PieceList *initializePieces();
 void printPieces(PieceList *);
 Piece *getPieceAtPosition(PieceList *, int, int);
 void modifyPiece(PieceList **, int, Piece);
+void kill(PieceList **, Piece);
 
 /**
  * Adds all the pieces to the Piece List
@@ -121,6 +122,19 @@ Piece *getPieceAtPosition(PieceList *pieceList, int x, int y)
     return NULL;
 }
 
+/**
+ * Kills a piece if it is possible
+ */
+void kill(PieceList **pieceList, Piece pieceToKill)
+{
+    Piece newPiece = {pieceToKill.id, pieceToKill.x, pieceToKill.y, pieceToKill.team, 0};
+    modifyPiece(pieceList, pieceToKill.id, newPiece);
+}
+
+/**
+ * Just for development
+ * Prints all the pieces with their info
+ */
 void printPieces(PieceList *pieceList)
 {
     PieceList *node = pieceList;
