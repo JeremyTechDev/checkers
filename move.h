@@ -1,11 +1,40 @@
 #if !defined(MOVE)
 #define MOVE
 
+#include <string.h>
 #include "structs.h"
 #include "piece.h"
 
 MoveList getPossibleMoves(PieceList *, Piece);
 int isMovePossible(PieceList *, Move);
+Move getCordsFromUser();
+
+/**
+ * Gets a valid [x,y] cord from the user 
+ */
+Move getCordsFromUser()
+{
+    int xCord, yCord;
+    char input[10];
+
+    while (1)
+    {
+        fgets(input, sizeof(input), stdin);
+
+        char letter = toupper(input[0]);
+        int number = input[1] - '0';
+
+        xCord = number - 1;
+        yCord = (int)(strchr(validLetters, letter) - validLetters);
+
+        // validate move
+        if ((xCord >= 0 && xCord <= 7) && (yCord >= 0 && yCord <= 7))
+            break;
+    }
+
+    Move move = {xCord, yCord};
+    return move;
+}
 
 /**
  * Returns whether a move is possible or not
@@ -15,7 +44,7 @@ int isMovePossible(PieceList *pieceList, Move move)
     if (move.x > 7 || move.x < 0)
         return 0;
 
-    if (move.y > 7 || move.x < 0)
+    if (move.y > 7 || move.y < 0)
         return 0;
 
     Piece *isTaken = getPieceAtPosition(pieceList, move.x, move.y);

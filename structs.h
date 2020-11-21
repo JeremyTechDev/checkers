@@ -3,6 +3,8 @@
 
 typedef char Board[8][8][4];
 
+const char *validLetters = "ABCDEFGH";
+
 typedef enum Team
 {
     black,
