@@ -14,18 +14,15 @@ void printColorText(const char *text, const char *color)
     printf("\033%s", REGULAR);
 }
 
-void yellow()
+void setColor(const char *color)
 {
-    printf("\033%s", YELLOW);
+    printf("\033%s", color);
 }
 
-void orange()
+void waitEnter()
 {
-    printf("\033%s", ORANGE);
-}
-
-void reset()
-{
-    printf("\033%s", REGULAR);
+    fflush(stdin);
+    getchar();
+    system("clear");
 }
 #endif // HELPERS

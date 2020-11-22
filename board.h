@@ -11,11 +11,12 @@ void printSpot(PieceList *, int, int, int);
 
 void printBoard(PieceList *pieceList, CoordList *coordsToHighlight)
 {
+    printColorText("Checkers Game!\n\n", YELLOW);
     for (int x = 0; x < 8; x++)
     {
-        yellow();
+        setColor(YELLOW);
         printf("%d ", x + 1);
-        reset();
+        setColor(REGULAR);
 
         for (int y = 0; y < 8; y++)
         {
@@ -27,7 +28,7 @@ void printBoard(PieceList *pieceList, CoordList *coordsToHighlight)
         printf("\n");
     }
 
-    printColorText("   A   B   C   D   E   F   G   H\n", YELLOW);
+    printColorText("   A   B   C   D   E   F   G   H\n\n", YELLOW);
 }
 
 /**
@@ -38,7 +39,7 @@ void printSpot(PieceList *pieceList, int x, int y, int highlight)
     Piece *currentPiece = (Piece *)malloc(sizeof(Piece));
 
     if (highlight)
-        orange();
+        setColor(ORANGE);
 
     currentPiece = getPieceAtPosition(pieceList, x, y);
     if (currentPiece && currentPiece->isOnGame)
@@ -46,7 +47,7 @@ void printSpot(PieceList *pieceList, int x, int y, int highlight)
     else
         printf("%s ", board[x][y]);
 
-    reset();
+    setColor(REGULAR);
 }
 
 #endif // BOARD

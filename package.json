@@ -1,6 +1,6 @@
 {
     "scripts": {
-      "start": "g++  -o main main.c && ./main",
+      "start": "clear & g++ -o main main.c && ./main",
       "compile": "g++ -g main.c"
     }
   }

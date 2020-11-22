@@ -8,44 +8,58 @@
 #include "piece.h"
 #include "move.h"
 
+void runRound(Team, PieceList *);
+void printTurnInfo(Team, PieceList *, CoordList *);
+
 int main(int argc, char const *argv[])
 {
-    printf("Checkers Game!\n\n");
-
     PieceList *pieceList = initializePieces();
 
     while (1)
     {
-        printBoard(pieceList, NULL);
-        printColorText("\nChoose the piece you want to move: ", BLUE);
+
+        runRound(white, pieceList);
+        runRound(black, pieceList);
+    }
+
+    return 0;
+}
+
+void runRound(Team team, PieceList *pieceList)
+{
+    printTurnInfo(team, pieceList, NULL);
+    printColorText("Choose the piece you want to move: ", BLUE);
+
+    while (1)
+    {
         Coord pieceChoice = getCoordsFromUser();
         Piece *pieceToMove = getPieceAtPosition(pieceList, pieceChoice.x, pieceChoice.y);
 
         if (pieceToMove)
         {
-            system("clear");
             CoordList *possibleMoves = getPossibleMoves(pieceList, *pieceToMove);
             CoordList *toHighlight = possibleMoves;
-            insertCoord(&toHighlight, pieceChoice);
+            insertCoord(&toHighlight, pieceChoice); // insert the selected piece to highlight
 
             if (possibleMoves)
             {
-                printBoard(pieceList, toHighlight);
-                printColorText("\nThese are your posible moves:\n", BLUE);
-                while (possibleMoves)
-                {
-                    printf(">%d %d\n", possibleMoves->coord.x, possibleMoves->coord.y);
-                    possibleMoves = possibleMoves->next;
-                }
+                system("clear");
+                printTurnInfo(team, pieceList, toHighlight);
+                printColorText("\nThese are your possible moves:\n", BLUE);
+                printTextCoord(possibleMoves);
+                break;
             }
+            else
+                printColorText("No possible moves for that piece, try another one: \a", RED);
         }
         else
-            printColorText("\nThere's no piece at that position, try another one\a\n\n", RED);
-
-        fflush(stdin); // option ONE to clean stdin
-        getchar();     // wait for ENTER
-        system("clear");
+            printColorText("No piece at that coord, try another one: \a", RED);
     }
+    waitEnter();
+}
 
-    return 0;
+void printTurnInfo(Team team, PieceList *pieceList, CoordList *toHighlight)
+{
+    printColorText(team == black ? "Playing: BLACKS\n" : "Playing: WHITES\n", YELLOW);
+    printBoard(pieceList, toHighlight);
 }
