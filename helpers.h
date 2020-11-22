@@ -19,10 +19,14 @@ void setColor(const char *color)
     printf("\033%s", color);
 }
 
-void waitEnter()
+void clear(int wait)
 {
-    fflush(stdin);
-    getchar();
+    if (wait)
+    {
+        printColorText("\nPress ENTER to continue\n", BLUE);
+        fflush(stdin);
+        getchar();
+    }
     system("clear");
 }
 #endif // HELPERS

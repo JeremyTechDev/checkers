@@ -45,7 +45,7 @@ void printSpot(PieceList *pieceList, int x, int y, int highlight)
     if (currentPiece && currentPiece->isOnGame)
         printf("[%s] ", currentPiece->team == black ? "B" : "W");
     else
-        printf("%s ", board[x][y]);
+        highlight ? printf(">%s ", convertCoordToText({x, y})) : printf("%s ", board[x][y]);
 
     setColor(REGULAR);
 }

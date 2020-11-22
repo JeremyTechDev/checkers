@@ -89,9 +89,7 @@ void modifyPiece(PieceList **pieceList, int id, Piece piece)
 
             (*pieceList)->prev->next = newNode;
 
-            while ((*pieceList)->prev != NULL)
-                (*pieceList) = (*pieceList)->prev;
-
+            free(node);
             return;
         }
         node = node->next;
@@ -111,6 +109,7 @@ Piece *getPieceAtPosition(PieceList *pieceList, int x, int y)
         if (node->piece.x == x && node->piece.y == y && node->piece.isOnGame)
         {
             Piece *piece = (Piece *)malloc(sizeof(Piece));
+            piece->id = node->piece.id;
             piece->x = node->piece.x;
             piece->y = node->piece.y;
             piece->team = node->piece.team;
