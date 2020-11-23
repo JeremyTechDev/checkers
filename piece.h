@@ -24,7 +24,7 @@ PieceList *initializePieces()
     for (int x = 0; x < 3; x++)
         for (int y = (x % 2 == 0 ? 1 : 0); y < 8; y += 2)
         {
-            Piece p = {id, x, y, white, 1};
+            Piece p = {id, {x, y}, white, 1};
             insertPiece(&pieceList, p);
             id++;
         }
@@ -33,7 +33,7 @@ PieceList *initializePieces()
     for (int x = 5; x < 8; x++)
         for (int y = (x % 2 == 0 ? 1 : 0); y < 8; y += 2)
         {
-            Piece p = {id, x, y, black, 1};
+            Piece p = {id, {x, y}, black, 1};
             insertPiece(&pieceList, p);
             id++;
         }
@@ -106,12 +106,12 @@ Piece *getPieceAtPosition(PieceList *pieceList, int x, int y)
 
     while (node != NULL)
     {
-        if (node->piece.x == x && node->piece.y == y && node->piece.isOnGame)
+        if (node->piece.coord.x == x && node->piece.coord.y == y && node->piece.isOnGame)
         {
             Piece *piece = (Piece *)malloc(sizeof(Piece));
             piece->id = node->piece.id;
-            piece->x = node->piece.x;
-            piece->y = node->piece.y;
+            piece->coord.x = node->piece.coord.x;
+            piece->coord.y = node->piece.coord.y;
             piece->team = node->piece.team;
             piece->isOnGame = 1;
             return piece;
@@ -126,7 +126,7 @@ Piece *getPieceAtPosition(PieceList *pieceList, int x, int y)
  */
 void kill(PieceList **pieceList, Piece pieceToKill)
 {
-    Piece newPiece = {pieceToKill.id, pieceToKill.x, pieceToKill.y, pieceToKill.team, 0};
+    Piece newPiece = {pieceToKill.id, {pieceToKill.coord.x, pieceToKill.coord.y}, pieceToKill.team, 0};
     modifyPiece(pieceList, pieceToKill.id, newPiece);
 }
 
@@ -139,7 +139,7 @@ void printPieces(PieceList *pieceList)
     PieceList *node = pieceList;
     while (node != NULL)
     {
-        printf(">%d Team: %s\t X: %d - Y: %d\n", node->piece.id, node->piece.team == black ? "black" : "white", node->piece.x, node->piece.y);
+        printf(">%d Team: %s\t X: %d - Y: %d\n", node->piece.id, node->piece.team == black ? "black" : "white", node->piece.coord.x, node->piece.coord.y);
         node = node->next;
     }
 }

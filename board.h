@@ -38,6 +38,7 @@ void printSpot(PieceList *pieceList, int x, int y, int highlight)
 {
     Piece *currentPiece = (Piece *)malloc(sizeof(Piece));
 
+    // FIXME: fix higlight color
     if (highlight)
         setColor(ORANGE);
 

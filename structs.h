@@ -11,11 +11,17 @@ typedef enum Team
     white
 } Team;
 
+typedef struct Coord
+{
+    int x;
+    int y;
+    int colorCode;
+} Coord;
+
 typedef struct Piece
 {
     int id;
-    int x;
-    int y;
+    Coord coord;
     Team team;
     int isOnGame;
 } Piece;
@@ -26,12 +32,6 @@ typedef struct PieceList
     struct PieceList *next;
     struct PieceList *prev;
 } PieceList;
-
-typedef struct Coord
-{
-    int x;
-    int y;
-} Coord;
 
 typedef struct CoordList
 {

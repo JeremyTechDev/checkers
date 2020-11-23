@@ -36,7 +36,7 @@ Coord getCoordsFromUser()
         printColorText("Invalid coord, try another one: ", RED);
     }
 
-    Coord coord = {xCord, yCord};
+    Coord coord = {xCord, yCord, 0};
     return coord;
 }
 

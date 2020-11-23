@@ -59,7 +59,7 @@ void runRound(Team team, PieceList *pieceList)
                     Coord moveChoice = getCoordsFromUser();
                     if (isCoordInList(possibleMoves, moveChoice.x, moveChoice.y))
                     {
-                        Piece newPiece = {pieceToMove->id, moveChoice.x, moveChoice.y, team, 1};
+                        Piece newPiece = {pieceToMove->id, {moveChoice.x, moveChoice.y}, team, 1};
                         modifyPiece(&pieceList, pieceToMove->id, newPiece);
                         break;
                     }
