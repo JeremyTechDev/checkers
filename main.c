@@ -9,7 +9,7 @@
 #include "move.h"
 
 void runRound(Team, PieceList *);
-void printTurnInfo(Team, PieceList *, CoordList *);
+void printTurnInfo(Team, PieceList *, MoveList *);
 
 int main(int argc, char const *argv[])
 {
@@ -17,8 +17,8 @@ int main(int argc, char const *argv[])
 
     while (1)
     {
-        runRound(white, pieceList);
         runRound(black, pieceList);
+        runRound(white, pieceList);
     }
 
     return 0;
@@ -42,9 +42,9 @@ void runRound(Team team, PieceList *pieceList)
                 continue;
             }
 
-            CoordList *possibleMoves = getPossibleMoves(pieceList, *pieceToMove);
-            CoordList *toHighlight = possibleMoves;
-            insertCoord(&toHighlight, pieceChoice); // insert the selected piece to highlight
+            MoveList *possibleMoves = getPossibleMoves(pieceList, *pieceToMove);
+            MoveList *toHighlight = possibleMoves;
+            insertMove(&toHighlight, {pieceChoice, -1}); // insert the selected piece to highlight
 
             if (possibleMoves)
             {
@@ -57,10 +57,18 @@ void runRound(Team team, PieceList *pieceList)
                 while (1) // to move
                 {
                     Coord moveChoice = getCoordsFromUser();
-                    if (isCoordInList(possibleMoves, moveChoice.x, moveChoice.y))
+                    Move *isMoveValid = isMoveInList(possibleMoves, moveChoice.x, moveChoice.y);
+                    if (isMoveValid)
                     {
+                        printf("??%d\n", isMoveValid->killedPieceId);
                         Piece newPiece = {pieceToMove->id, {moveChoice.x, moveChoice.y}, team, 1};
                         modifyPiece(&pieceList, pieceToMove->id, newPiece);
+
+                        if (isMoveValid->killedPieceId != -1)
+                        {
+                            Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, 0}, white, 0};
+                            modifyPiece(&pieceList, isMoveValid->killedPieceId, killedPiece);
+                        }
                         break;
                     }
                     else
@@ -77,7 +85,7 @@ void runRound(Team team, PieceList *pieceList)
     }
 }
 
-void printTurnInfo(Team team, PieceList *pieceList, CoordList *toHighlight)
+void printTurnInfo(Team team, PieceList *pieceList, MoveList *toHighlight)
 {
     printBoard(pieceList, toHighlight);
     printColorText(team == black ? "Playing: BLACKS\n" : "Playing: WHITES\n", YELLOW);

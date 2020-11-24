@@ -6,10 +6,10 @@
 #include "structs.h"
 #include "helpers.h"
 
+Coord getCoordsFromUser();
 void insertCoord(CoordList **, Coord);
-int isCoordInList(CoordList, int, int);
 char *convertCoordToText(Coord);
-void printTextCoord(CoordList *);
+void printTextCoord(MoveList *);
 
 /**
  * Gets a valid [x,y] cord from the user 
@@ -71,21 +71,6 @@ void insertCoord(CoordList **coordsList, Coord coord)
 }
 
 /**
- * Returns whether a coord is in the given coord list
- */
-int isCoordInList(CoordList *coordList, int x, int y)
-{
-    while (coordList)
-    {
-        if (coordList->coord.x == x && coordList->coord.y == y)
-            return 1;
-        coordList = coordList->next;
-    }
-
-    return 0;
-}
-
-/**
  * Converts a [x,y] coord to @# text
  */
 char *convertCoordToText(Coord coord)
@@ -103,13 +88,13 @@ char *convertCoordToText(Coord coord)
 /**
  * Prints a list of text coords
  */
-void printTextCoord(CoordList *coordList)
+void printTextCoord(MoveList *moveList)
 {
     setColor(BLUE);
-    while (coordList)
+    while (moveList)
     {
-        printf("> %s\n", convertCoordToText(coordList->coord));
-        coordList = coordList->next;
+        printf("> %s\n", convertCoordToText(moveList->move.coord));
+        moveList = moveList->next;
     }
     setColor(REGULAR);
 }

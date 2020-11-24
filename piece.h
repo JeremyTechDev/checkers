@@ -1,5 +1,6 @@
 #if !defined(PIECE)
 #define PIECE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +11,6 @@ PieceList *initializePieces();
 void printPieces(PieceList *);
 Piece *getPieceAtPosition(PieceList *, int, int);
 void modifyPiece(PieceList **, int, Piece);
-void kill(PieceList **, Piece);
 
 /**
  * Adds all the pieces to the Piece List
@@ -37,6 +37,10 @@ PieceList *initializePieces()
             insertPiece(&pieceList, p);
             id++;
         }
+
+    // dev:
+    insertPiece(&pieceList, {50, {4, 3}, white, 1});
+    // insertPiece(&pieceList, {51, {4, 3}, white, 1});
 
     return pieceList;
 }
@@ -76,6 +80,7 @@ void insertPiece(PieceList **pieceList, Piece piece)
  */
 void modifyPiece(PieceList **pieceList, int id, Piece piece)
 {
+    PieceList *firstPos = *pieceList;
     PieceList *node = *pieceList;
     PieceList *newNode = (PieceList *)malloc(sizeof(PieceList));
 
@@ -87,7 +92,11 @@ void modifyPiece(PieceList **pieceList, int id, Piece piece)
             newNode->next = node->next;
             newNode->prev = node->prev;
 
-            (*pieceList)->prev->next = newNode;
+            if ((*pieceList)->prev)
+                (*pieceList)->prev->next = newNode;
+
+            // return to first pos
+            *pieceList = firstPos->next;
 
             free(node);
             return;
@@ -95,6 +104,9 @@ void modifyPiece(PieceList **pieceList, int id, Piece piece)
         node = node->next;
         (*pieceList) = (*pieceList)->next;
     }
+
+    // return to first pos
+    *pieceList = firstPos;
 }
 
 /**
@@ -119,15 +131,6 @@ Piece *getPieceAtPosition(PieceList *pieceList, int x, int y)
         node = node->next;
     }
     return NULL;
-}
-
-/**
- * Kills a piece if it is possible
- */
-void kill(PieceList **pieceList, Piece pieceToKill)
-{
-    Piece newPiece = {pieceToKill.id, {pieceToKill.coord.x, pieceToKill.coord.y}, pieceToKill.team, 0};
-    modifyPiece(pieceList, pieceToKill.id, newPiece);
 }
 
 /**

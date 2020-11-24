@@ -26,6 +26,12 @@ typedef struct Piece
     int isOnGame;
 } Piece;
 
+typedef struct Move
+{
+    Coord coord;
+    int killedPieceId; // -1 for no piece killed
+} Move;
+
 typedef struct PieceList
 {
     Piece piece;
@@ -39,6 +45,13 @@ typedef struct CoordList
     struct CoordList *next;
     struct CoordList *prev;
 } CoordList;
+
+typedef struct MoveList
+{
+    Move move;
+    struct MoveList *next;
+    struct MoveList *prev;
+} MoveList;
 
 Board board = {
     {"( )", "[ ]", "( )", "[ ]", "( )", "[ ]", "( )", "[ ]"},

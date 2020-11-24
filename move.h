@@ -6,11 +6,42 @@
 #include "piece.h"
 #include "coord.h"
 
-CoordList *getPossibleMoves(PieceList *, Piece);
+void insertMove(MoveList **, Move);
 int isMovePossible(PieceList *, Coord);
-Coord getCoordsFromUser();
-int isCoordInList(CoordList, int, int);
-Coord getKillingMove(PieceList *, Piece, int);
+MoveList *getPossibleMoves(PieceList *, Piece);
+Move getKillingMove(PieceList *, Piece, int);
+Move *isMoveInList(CoordList *, int, int);
+
+/**
+ * Inserts a move into the move list
+ */
+void insertMove(MoveList **moveList, Move move)
+{
+    MoveList *node = (MoveList *)malloc(sizeof(MoveList));
+
+    if (node == NULL)
+    {
+        printf("No space for the new move...\n");
+        exit(-1);
+    }
+
+    node->move = move;
+    node->next = NULL;
+    node->prev = NULL;
+
+    // insert in the first position
+    if (*moveList == NULL)
+    {
+        *moveList = node;
+        return;
+    }
+
+    // inserting at first position (push)
+    node->next = *moveList;
+    (*moveList)->prev = node;
+    *moveList = node;
+}
+
 /**
  * Returns whether a move is possible or not
  */
@@ -32,9 +63,9 @@ int isMovePossible(PieceList *pieceList, Coord move)
 /**
  * Returns all the posible moves for a piece
  */
-CoordList *getPossibleMoves(PieceList *pieceList, Piece piece)
+MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
 {
-    CoordList *possibleMoves = NULL;
+    MoveList *possibleMoves = NULL;
 
     Coord posMove1 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y + 1, 4};
     Coord posMove2 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y - 1, 4};
@@ -47,22 +78,48 @@ CoordList *getPossibleMoves(PieceList *pieceList, Piece piece)
      * otherwise, just add the move to the list
      */
     if (pieceAtPosMove1 && pieceAtPosMove1->team != piece.team)
-        insertCoord(&possibleMoves, getKillingMove(pieceList, *pieceAtPosMove1, 1));
-    else if (isMovePossible(pieceList, posMove1))
-        insertCoord(&possibleMoves, posMove1);
+        insertMove(&possibleMoves, getKillingMove(pieceList, *pieceAtPosMove1, 1));
 
     if (pieceAtPosMove2 && pieceAtPosMove2->team != piece.team)
-        insertCoord(&possibleMoves, getKillingMove(pieceList, *pieceAtPosMove2, -1));
-    else if (isMovePossible(pieceList, posMove2))
-        insertCoord(&possibleMoves, posMove2);
+        insertMove(&possibleMoves, getKillingMove(pieceList, *pieceAtPosMove2, -1));
+
+    // If no possible moves at this point, there are no killing moves
+    if (!possibleMoves)
+    {
+        if (isMovePossible(pieceList, posMove1))
+            insertMove(&possibleMoves, {posMove1, -1});
+        if (isMovePossible(pieceList, posMove2))
+            insertMove(&possibleMoves, {posMove2, -1});
+    }
 
     return possibleMoves;
 }
 
-Coord getKillingMove(PieceList *pieceList, Piece piece, int increment)
+Move getKillingMove(PieceList *pieceList, Piece piece, int increment)
 {
-    Coord posKillingMove = {piece.coord.x + (piece.team == black ? 1 : -1), piece.coord.y + increment, 3};
+    Move posKillingMove = {{piece.coord.x + (piece.team == black ? 1 : -1), piece.coord.y + increment, 3}, piece.id};
     return posKillingMove;
+}
+
+/**
+ * Returns whether a move is in the given move list
+ */
+Move *isMoveInList(MoveList *moveList, int x, int y)
+{
+    while (moveList)
+    {
+        if (moveList->move.coord.x == x && moveList->move.coord.y == y)
+        {
+            Move *move = (Move *)malloc(sizeof(Move));
+            move->coord.x = moveList->move.coord.x;
+            move->coord.y = moveList->move.coord.y;
+            move->coord.colorCode = moveList->move.coord.colorCode;
+            move->killedPieceId = moveList->move.killedPieceId;
+            return move;
+        }
+        moveList = moveList->next;
+    }
+    return NULL;
 }
 
 #endif // MOVE

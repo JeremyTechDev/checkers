@@ -9,9 +9,7 @@ const char ORANGE[15] = "[01;33m";     // code 4
 
 void printColorText(const char *text, const char *color)
 {
-    printf("\033%s", color);
-    printf("%s", text);
-    printf("\033%s", REGULAR);
+    printf("\033%s%s\033%s", color, text, REGULAR);
 }
 
 void setColor(const char *color)
