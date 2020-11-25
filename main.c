@@ -67,7 +67,7 @@ void runRound(Team team, PieceList *pieceList)
 
                         if (isMoveValid->killedPieceId != -1)
                         {
-                            Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, 0}, white, 0};
+                            Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, white, 0};
                             modifyPiece(&pieceList, isMoveValid->killedPieceId, killedPiece);
                         }
                         break;
@@ -89,5 +89,5 @@ void runRound(Team team, PieceList *pieceList)
 void printTurnInfo(Team team, PieceList *pieceList, MoveList *toHighlight)
 {
     printBoard(pieceList, toHighlight);
-    printColorText(team == black ? "Playing: BLACKS\n" : "Playing: WHITES\n", YELLOW);
+    printColorText(team == black ? "Playing: BLACKS\n" : "Playing: WHITES\n", GREEN);
 }

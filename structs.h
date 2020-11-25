@@ -11,11 +11,20 @@ typedef enum Team
     white
 } Team;
 
+typedef enum Color
+{
+    regular,
+    green,
+    blue,
+    red,
+    orange,
+} Color;
+
 typedef struct Coord
 {
     int x;
     int y;
-    int colorCode;
+    Color colorCode;
 } Coord;
 
 typedef struct Piece

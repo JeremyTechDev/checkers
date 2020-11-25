@@ -67,8 +67,8 @@ MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
 {
     MoveList *possibleMoves = NULL;
 
-    Coord posMove1 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y + 1, 4};
-    Coord posMove2 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y - 1, 4};
+    Coord posMove1 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y + 1, orange};
+    Coord posMove2 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y - 1, orange};
 
     Piece *pieceAtPosMove1 = getPieceAtPosition(pieceList, posMove1.x, posMove1.y);
     Piece *pieceAtPosMove2 = getPieceAtPosition(pieceList, posMove2.x, posMove2.y);
@@ -99,7 +99,7 @@ MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
 
 Move getKillingMove(PieceList *pieceList, Piece piece, int increment)
 {
-    Move posKillingMove = {{piece.coord.x + (piece.team == black ? 1 : -1), piece.coord.y + increment, 3}, piece.id};
+    Move posKillingMove = {{piece.coord.x + (piece.team == black ? 1 : -1), piece.coord.y + increment, red}, piece.id};
     return posKillingMove;
 }
 

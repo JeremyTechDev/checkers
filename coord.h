@@ -36,7 +36,7 @@ Coord getCoordsFromUser()
         printColorText("Invalid coord, try another one: ", RED);
     }
 
-    Coord coord = {xCord, yCord, 4}; // 4 is color code orange
+    Coord coord = {xCord, yCord, orange};
     return coord;
 }
 
