@@ -44,6 +44,7 @@ void printBoard(PieceList *pieceList, MoveList *coordsToHighlight)
  */
 void printSpot(PieceList *pieceList, int x, int y, int colorCode)
 {
+    Coord coord = {x, y, colorCode};
     Piece *currentPiece = (Piece *)malloc(sizeof(Piece));
 
     setHighlightColor(colorCode);
@@ -52,7 +53,7 @@ void printSpot(PieceList *pieceList, int x, int y, int colorCode)
     if (currentPiece && currentPiece->isOnGame != 0)
         printf("[%s] ", currentPiece->team == black ? "B" : "W");
     else
-        colorCode ? printf(">%s ", convertCoordToText({x, y})) : printf("%s ", board[x][y]);
+        colorCode ? printf(">%s ", convertCoordToText(coord)) : printf("%s ", board[x][y]);
 
     setColor(REGULAR);
 }

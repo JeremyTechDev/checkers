@@ -44,7 +44,8 @@ void runRound(Team team, PieceList *pieceList)
 
             MoveList *possibleMoves = getPossibleMoves(pieceList, *pieceToMove);
             MoveList *toHighlight = possibleMoves;
-            insertMove(&toHighlight, {pieceChoice, -1}); // insert the selected piece to highlight
+            Move move = {pieceChoice, -1};
+            insertMove(&toHighlight, move); // insert the selected piece to highlight
 
             if (possibleMoves)
             {

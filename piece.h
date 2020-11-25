@@ -38,10 +38,6 @@ PieceList *initializePieces()
             id++;
         }
 
-    // dev:
-    insertPiece(&pieceList, {50, {4, 3}, white, 1});
-    // insertPiece(&pieceList, {51, {4, 3}, white, 1});
-
     return pieceList;
 }
 

@@ -86,10 +86,12 @@ MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
     // If no possible moves at this point, there are no killing moves
     if (!possibleMoves)
     {
+        Move move1 = {posMove1, -1};
+        Move move2 = {posMove2, -1};
         if (isMovePossible(pieceList, posMove1))
-            insertMove(&possibleMoves, {posMove1, -1});
+            insertMove(&possibleMoves, move1);
         if (isMovePossible(pieceList, posMove2))
-            insertMove(&possibleMoves, {posMove2, -1});
+            insertMove(&possibleMoves, move2);
     }
 
     return possibleMoves;
