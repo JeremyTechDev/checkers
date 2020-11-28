@@ -114,7 +114,7 @@ Piece *getPieceAtPosition(PieceList *pieceList, int x, int y)
 
     while (node != NULL)
     {
-        if (node->piece.coord.x == x && node->piece.coord.y == y && node->piece.isOnGame)
+        if (node->piece.coord.x == x && node->piece.coord.y == y && node->piece.isOnGame == 1)
         {
             Piece *piece = (Piece *)malloc(sizeof(Piece));
             piece->id = node->piece.id;

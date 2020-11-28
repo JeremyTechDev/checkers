@@ -9,7 +9,7 @@
 void insertMove(MoveList **, Move, Piece *);
 int isMovePossible(PieceList *, Coord);
 MoveList *getPossibleMoves(PieceList *, Piece);
-Move getKillingMove(PieceList *, Piece, int);
+Move *getKillingMove(PieceList *, Piece, int);
 MoveList *checkIfKillingMoves(PieceList *, Team);
 Move *isMoveInList(CoordList *, int, int);
 
@@ -80,10 +80,18 @@ MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
      * otherwise, just add the move to the list
      */
     if (pieceAtPosMove1 && pieceAtPosMove1->team != piece.team)
-        insertMove(&possibleMoves, getKillingMove(pieceList, *pieceAtPosMove1, 1), &piece);
+    {
+        Move *killingMove = getKillingMove(pieceList, *pieceAtPosMove1, 1);
+        if (killingMove)
+            insertMove(&possibleMoves, *killingMove, &piece);
+    }
 
     if (pieceAtPosMove2 && pieceAtPosMove2->team != piece.team)
-        insertMove(&possibleMoves, getKillingMove(pieceList, *pieceAtPosMove2, -1), &piece);
+    {
+        Move *killingMove = getKillingMove(pieceList, *pieceAtPosMove2, -1);
+        if (killingMove)
+            insertMove(&possibleMoves, *killingMove, &piece);
+    }
 
     // If no possible moves at this point, there are no killing moves
     if (!possibleMoves)
@@ -99,9 +107,23 @@ MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
     return possibleMoves;
 }
 
-Move getKillingMove(PieceList *pieceList, Piece piece, int increment)
+Move *getKillingMove(PieceList *pieceList, Piece piece, int increment)
 {
-    return {{piece.coord.x + (piece.team == black ? 1 : -1), piece.coord.y + increment, red}, NULL, piece.id};
+    Move *move = (Move *)malloc(sizeof(Move));
+    int x = piece.coord.x + (piece.team == black ? 1 : -1);
+    int y = piece.coord.y + increment;
+
+    if (!getPieceAtPosition(pieceList, x, y))
+    {
+        move->coord = {x, y, red};
+        move->killedPieceId = piece.id;
+        move->killingPiece = NULL;
+        if (isMovePossible(pieceList, move->coord))
+            return move;
+        return NULL;
+    }
+
+    return NULL;
 }
 
 /**
@@ -121,7 +143,10 @@ MoveList *checkIfKillingMoves(PieceList *pieceList, Team team)
                 while (moveNode)
                 {
                     if (moveNode->move.killedPieceId != -1)
+                    {
+                        moveNode->move.killingPiece->coord.colorCode = orange;
                         return moveNode;
+                    }
                     moveNode = moveNode->next;
                 }
             }
