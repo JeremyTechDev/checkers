@@ -38,6 +38,7 @@ typedef struct Piece
 typedef struct Move
 {
     Coord coord;
+    Piece *killingPiece;
     int killedPieceId; // -1 for no piece killed
 } Move;
 

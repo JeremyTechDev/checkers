@@ -24,7 +24,7 @@ PieceList *initializePieces()
     for (int x = 0; x < 3; x++)
         for (int y = (x % 2 == 0 ? 1 : 0); y < 8; y += 2)
         {
-            Piece p = {id, {x, y}, white, 1};
+            Piece p = {id, {x, y, regular}, white, 1};
             insertPiece(&pieceList, p);
             id++;
         }
@@ -33,7 +33,7 @@ PieceList *initializePieces()
     for (int x = 5; x < 8; x++)
         for (int y = (x % 2 == 0 ? 1 : 0); y < 8; y += 2)
         {
-            Piece p = {id, {x, y}, black, 1};
+            Piece p = {id, {x, y, regular}, black, 1};
             insertPiece(&pieceList, p);
             id++;
         }

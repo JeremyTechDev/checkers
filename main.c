@@ -32,12 +32,23 @@ void runRound(Team team, PieceList *pieceList)
 
     while (1) // to get piece and moving spot
     {
-        Piece pieceToMove = getPieceToMove(pieceList, team);
+        Piece pieceToMove;
+        MoveList *possibleMoves;
+        MoveList *turnHasKillingMoves = checkIfKillingMoves(pieceList, team);
+        if (turnHasKillingMoves)
+        {
+            possibleMoves = turnHasKillingMoves;
+            pieceToMove = *turnHasKillingMoves->move.killingPiece;
+            pieceToMove.coord.colorCode = orange;
+        }
+        else
+        {
+            pieceToMove = getPieceToMove(pieceList, team);
+            possibleMoves = getPossibleMoves(pieceList, pieceToMove);
+        }
 
-        MoveList *possibleMoves = getPossibleMoves(pieceList, pieceToMove);
-        MoveList *toHighlight = possibleMoves;
-        Move move = {pieceToMove.coord, -1};
-        insertMove(&toHighlight, move); // insert the selected piece to highlight
+        MoveList *toHighlight = possibleMoves; // insert the selected piece to highlight
+        insertMove(&toHighlight, {pieceToMove.coord, &pieceToMove, -1}, NULL);
 
         if (possibleMoves)
         {
@@ -53,7 +64,6 @@ void runRound(Team team, PieceList *pieceList)
                 Move *isMoveValid = isMoveInList(possibleMoves, moveChoice.x, moveChoice.y);
                 if (isMoveValid)
                 {
-                    printf("??%d\n", isMoveValid->killedPieceId);
                     Piece newPiece = {pieceToMove.id, {moveChoice.x, moveChoice.y}, team, 1};
                     modifyPiece(&pieceList, pieceToMove.id, newPiece);
 
