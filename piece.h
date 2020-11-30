@@ -77,32 +77,17 @@ void insertPiece(PieceList **pieceList, Piece piece)
 void modifyPiece(PieceList **pieceList, int id, Piece piece)
 {
     PieceList *firstPos = *pieceList;
-    PieceList *node = *pieceList;
-    PieceList *newNode = (PieceList *)malloc(sizeof(PieceList));
 
-    while (node != NULL)
+    while (*pieceList)
     {
-        if (node->piece.id == id)
+        if ((*pieceList)->piece.id == id)
         {
-            newNode->piece = piece;
-            newNode->next = node->next;
-            newNode->prev = node->prev;
-
-            if ((*pieceList)->prev)
-                (*pieceList)->prev->next = newNode;
-
-            // return to first pos
-            *pieceList = firstPos->next;
-
-            free(node);
-            return;
+            (*pieceList)->piece = piece;
+            break;
         }
-        node = node->next;
         (*pieceList) = (*pieceList)->next;
     }
-
-    // return to first pos
-    *pieceList = firstPos;
+    *pieceList = firstPos; // return to first pos
 }
 
 /**

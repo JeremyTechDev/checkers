@@ -11,6 +11,7 @@ int isMovePossible(PieceList *, Coord);
 MoveList *getPossibleMoves(PieceList *, Piece);
 Move *getKillingMove(PieceList *, Piece, int);
 MoveList *checkIfKillingMoves(PieceList *, Team);
+MoveList *pieceHasKillingMoves(PieceList *, Piece);
 Move *isMoveInList(CoordList *, int, int);
 
 /**
@@ -154,6 +155,20 @@ MoveList *checkIfKillingMoves(PieceList *pieceList, Team team)
         node = node->next;
     }
     return NULL;
+}
+
+MoveList *pieceHasKillingMoves(PieceList *pieceList, Piece piece)
+{
+    MoveList *possibleMoves = getPossibleMoves(pieceList, piece), *result = NULL;
+
+    while (possibleMoves)
+    {
+        if (possibleMoves->move.killedPieceId != -1)
+            insertMove(&result, possibleMoves->move, &piece);
+        possibleMoves = possibleMoves->next;
+    }
+
+    return result;
 }
 
 /**

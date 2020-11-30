@@ -10,6 +10,8 @@
 
 void runRound(Team, PieceList *);
 void printTurnInfo(Team, PieceList *, MoveList *);
+void handleMultipleKill(PieceList *, Piece);
+void handleKill(PieceList **, Move *, Piece);
 Piece getPieceToMove(PieceList *, Team);
 MoveList *getTurnMoves(PieceList *, Piece *, Team);
 
@@ -31,32 +33,57 @@ void runRound(Team team, PieceList *pieceList)
     printTurnInfo(team, pieceList, NULL);
     printColorText("Choose the piece you want to move: ", BLUE);
 
-    while (1) // to get piece and moving spot
+    Piece pieceToMove;
+    MoveList *possibleMoves = getTurnMoves(pieceList, &pieceToMove, team);
+
+    while (1)
     {
-        Piece pieceToMove;
-        MoveList *possibleMoves = getTurnMoves(pieceList, &pieceToMove, team);
-
-        while (1) // to move
+        Coord moveChoice = getCoordsFromUser();
+        Move *isMoveValid = isMoveInList(possibleMoves, moveChoice.x, moveChoice.y);
+        if (isMoveValid)
         {
-            Coord moveChoice = getCoordsFromUser();
-            Move *isMoveValid = isMoveInList(possibleMoves, moveChoice.x, moveChoice.y);
-            if (isMoveValid)
-            {
-                Piece newPiece = {pieceToMove.id, {moveChoice.x, moveChoice.y}, team, 1};
-                modifyPiece(&pieceList, pieceToMove.id, newPiece);
+            Piece newPiece = {pieceToMove.id, {moveChoice.x, moveChoice.y}, team, 1};
+            modifyPiece(&pieceList, pieceToMove.id, newPiece);
 
-                if (isMoveValid->killedPieceId != -1)
-                {
-                    Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, white, 0};
-                    modifyPiece(&pieceList, isMoveValid->killedPieceId, killedPiece);
-                }
-                break;
-            }
-            else
-                printColorText("That's not a possible move, try another one", RED);
+            handleKill(&pieceList, isMoveValid, newPiece);
+            break;
         }
-        clear(0);
-        break;
+        else
+            printColorText("That's not a possible move, try another one", RED);
+    }
+    clear(0);
+}
+
+void handleKill(PieceList **pieceList, Move *move, Piece killingPiece)
+{
+    if (move->killedPieceId != -1)
+    {
+        Piece killedPiece = {move->killedPieceId, {0, 0, regular}, white, 0};
+        modifyPiece(pieceList, move->killedPieceId, killedPiece);
+        handleMultipleKill(*pieceList, killingPiece);
+    }
+}
+
+void handleMultipleKill(PieceList *pieceList, Piece killingPiece)
+{
+    MoveList *hasMoreKillingMoves = pieceHasKillingMoves(pieceList, killingPiece);
+    while (hasMoreKillingMoves)
+    {
+        MoveList *possibleMoves = getTurnMoves(pieceList, &killingPiece, killingPiece.team);
+        Coord moveChoice = getCoordsFromUser();
+        Move *isMoveValid = isMoveInList(possibleMoves, moveChoice.x, moveChoice.y);
+        if (isMoveValid)
+        {
+            killingPiece = {killingPiece.id, {moveChoice.x, moveChoice.y}, killingPiece.team, 1};
+            modifyPiece(&pieceList, killingPiece.id, killingPiece);
+
+            Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, white, 0};
+            modifyPiece(&pieceList, isMoveValid->killedPieceId, killedPiece);
+
+            hasMoreKillingMoves = pieceHasKillingMoves(pieceList, killingPiece);
+        }
+        else
+            printColorText("That's not a possible move, try another one", RED);
     }
 }
 
