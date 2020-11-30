@@ -20,23 +20,31 @@ PieceList *initializePieces()
     int id = 0;
     PieceList *pieceList = NULL;
 
-    // white pieces
-    for (int x = 0; x < 3; x++)
-        for (int y = (x % 2 == 0 ? 1 : 0); y < 8; y += 2)
-        {
-            Piece p = {id, {x, y, regular}, white, 1};
-            insertPiece(&pieceList, p);
-            id++;
-        }
+    Piece p1 = {1, {4, 3, regular}, black, 1};
+    Piece p2 = {2, {3, 2, regular}, white, 1};
+    Piece p3 = {3, {1, 2, regular}, white, 1};
 
-    // black pieces
-    for (int x = 5; x < 8; x++)
-        for (int y = (x % 2 == 0 ? 1 : 0); y < 8; y += 2)
-        {
-            Piece p = {id, {x, y, regular}, black, 1};
-            insertPiece(&pieceList, p);
-            id++;
-        }
+    insertPiece(&pieceList, p1);
+    insertPiece(&pieceList, p2);
+    insertPiece(&pieceList, p3);
+
+    // white pieces
+    // for (int x = 0; x < 3; x++)
+    //     for (int y = (x % 2 == 0 ? 1 : 0); y < 8; y += 2)
+    //     {
+    //         Piece p = {id, {x, y, regular}, white, 1};
+    //         insertPiece(&pieceList, p);
+    //         id++;
+    //     }
+
+    // // black pieces
+    // for (int x = 5; x < 8; x++)
+    //     for (int y = (x % 2 == 0 ? 1 : 0); y < 8; y += 2)
+    //     {
+    //         Piece p = {id, {x, y, regular}, black, 1};
+    //         insertPiece(&pieceList, p);
+    //         id++;
+    //     }
 
     return pieceList;
 }

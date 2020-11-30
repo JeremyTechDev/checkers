@@ -27,6 +27,13 @@ Coord getCoordsFromUser()
         char letter = toupper(*input);
         int number = *(input + 1) - '0';
 
+        if (letter == 'Q')
+        {
+            clear(0);
+            printf("\nGame Stopped!\n");
+            exit(0);
+        }
+
         xCord = number - 1;
         yCord = (int)(strchr(validLetters, letter) - validLetters);
 

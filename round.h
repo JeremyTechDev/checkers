@@ -9,6 +9,7 @@ void handleKill(PieceList **, Move *, Piece);
 void handleMultipleKill(PieceList *, Piece);
 Piece getPieceToMove(PieceList *, Team);
 MoveList *getRoundMoves(PieceList *, Piece *, Team);
+Team isGameOver(PieceList *);
 
 void runRound(Team team, PieceList *pieceList)
 {
@@ -40,7 +41,7 @@ void handleKill(PieceList **pieceList, Move *move, Piece killingPiece)
 {
     if (move->killedPieceId != -1)
     {
-        Piece killedPiece = {move->killedPieceId, {0, 0, regular}, white, 0};
+        Piece killedPiece = {move->killedPieceId, {0, 0, regular}, none, 0};
         modifyPiece(pieceList, move->killedPieceId, killedPiece);
         handleMultipleKill(*pieceList, killingPiece);
     }
@@ -59,7 +60,7 @@ void handleMultipleKill(PieceList *pieceList, Piece killingPiece)
             killingPiece = {killingPiece.id, {moveChoice.x, moveChoice.y}, killingPiece.team, 1};
             modifyPiece(&pieceList, killingPiece.id, killingPiece);
 
-            Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, white, 0};
+            Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, none, 0};
             modifyPiece(&pieceList, isMoveValid->killedPieceId, killedPiece);
 
             hasMoreKillingMoves = pieceHasKillingMoves(pieceList, killingPiece);
@@ -119,6 +120,26 @@ Piece getPieceToMove(PieceList *pieceList, Team team)
         else
             printColorText("No piece at that coord, try another one: \a", RED);
     }
+}
+
+/**
+ * Returns the winner, if there is one
+ */
+Team isGameOver(PieceList *pieceList)
+{
+    int whitePieces = 0, blackPieces = 0;
+    while (pieceList)
+    {
+        if (pieceList->piece.team == white)
+            whitePieces++;
+        if (pieceList->piece.team == black)
+            blackPieces++;
+        pieceList = pieceList->next;
+    }
+
+    if (whitePieces != 0 && blackPieces != 0)
+        return none;
+    return whitePieces == 0 ? white : black;
 }
 
 void printRoundInfo(Team team, PieceList *pieceList, MoveList *toHighlight)

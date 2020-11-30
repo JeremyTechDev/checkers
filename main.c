@@ -11,12 +11,18 @@
 
 int main(int argc, char const *argv[])
 {
+    Team currentRoundTeam = black;
     PieceList *pieceList = initializePieces();
 
     while (1)
     {
-        runRound(black, pieceList);
-        runRound(white, pieceList);
+        runRound(currentRoundTeam, pieceList);
+        if (isGameOver(pieceList) != none)
+        {
+            printColorText("Game over!\n", RED);
+            exit(0);
+        }
+        currentRoundTeam = currentRoundTeam == black ? white : black;
     }
 
     return 0;
