@@ -91,11 +91,13 @@ char *convertCoordToText(Coord coord)
 void printTextCoord(MoveList *moveList)
 {
     setColor(BLUE);
+    printf("These are your possible moves:\n");
     while (moveList)
     {
         printf("> %s\n", convertCoordToText(moveList->move.coord));
         moveList = moveList->next;
     }
+    printf(">>> ");
     setColor(REGULAR);
 }
 

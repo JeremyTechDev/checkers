@@ -8,7 +8,8 @@ const char *validLetters = "ABCDEFGH";
 typedef enum Team
 {
     black,
-    white
+    white,
+    none,
 } Team;
 
 typedef enum Color
