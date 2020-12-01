@@ -169,24 +169,58 @@ Team isGameOver(PieceList *pieceList)
 
 void giveUp(Team givingUp)
 {
-    char giveUp = 0;
-    printColorText("\nAre you sure you want to give up? [y/n]: \n", RED);
+    char giveUp, option;
+
+    printColorText("Ask to draw (D) or give up (G)?\n", RED);
 
     while (1)
     {
-        scanf(" %c", &giveUp);
+        printColorText(">>> ", RED);
+        scanf(" %c", &option);
         getchar();
 
-        if (tolower(giveUp) == 'y')
+        if (tolower(option) == 'd')
         {
-            printf(givingUp == black ? "Black gives up!\n" : "White gives up!\n");
-            printf(givingUp == black ? "White wins!\n" : "Black wins!\n");
-            exit(0);
-        }
-        else if (tolower(giveUp) == 'n')
+            printColorText("Asking to draw! Insert Y if both players agree to draw, anything else to cancel: \n", RED);
+            while (1)
+            {
+                printColorText(">>> ", RED);
+                scanf(" %c", &giveUp);
+                getchar();
+
+                if (tolower(giveUp) == 'y')
+                {
+                    printf("Match end with a draw!\n");
+                    exit(0);
+                }
+                break;
+            }
+            printColorText("Canceled! Continue playing...\nChoose the piece to move\n", GREEN);
             break;
+        }
+
+        if (tolower(option) == 'g')
+        {
+            printColorText("\nAre you sure you want to give up? [y/n]: \n", RED);
+            while (1)
+            {
+                printColorText(">>> ", RED);
+                scanf(" %c", &giveUp);
+                getchar();
+
+                if (tolower(giveUp) == 'y')
+                {
+                    printf(givingUp == black ? "Black gives up!\n" : "White gives up!\n");
+                    printf(givingUp == black ? "White wins!\n" : "Black wins!\n");
+                    exit(0);
+                }
+                else if (tolower(giveUp) == 'n')
+                    break;
+            }
+            printColorText("Canceled! Continue playing...\nChoose the piece/coord to move\n", GREEN);
+            break;
+        }
     }
-    printColorText("Canceled! Continue playing...\n", GREEN);
 }
 
 int isNewQueen(Piece p, Coord m)
@@ -198,7 +232,7 @@ void printRoundInfo(Team team, PieceList *pieceList, MoveList *toHighlight)
 {
     printBoard(pieceList, toHighlight);
     printColorText(team == black ? "Playing: BLACKS\n" : "Playing: WHITES\n", GREEN);
-    printColorText("Insert Q to give up\n", GREEN);
+    printColorText("Insert Q to give up or ask to draw\n", GREEN);
 }
 
 #endif // ROUND
