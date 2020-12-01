@@ -9,6 +9,7 @@ void handleKill(PieceList **, Move *, Piece);
 void handleMultipleKill(PieceList *, Piece);
 Piece getPieceToMove(PieceList *, Team);
 MoveList *getRoundMoves(PieceList *, Piece *, Team);
+int isNewQueen(Piece, Coord);
 Team isGameOver(PieceList *);
 
 void runRound(Team team, PieceList *pieceList)
@@ -25,7 +26,8 @@ void runRound(Team team, PieceList *pieceList)
         Move *isMoveValid = isMoveInList(possibleMoves, moveChoice.x, moveChoice.y);
         if (isMoveValid)
         {
-            Piece newPiece = {pieceToMove.id, {moveChoice.x, moveChoice.y}, team, 1};
+            int isQueen = isNewQueen(pieceToMove, moveChoice);
+            Piece newPiece = {pieceToMove.id, {moveChoice.x, moveChoice.y}, team, isQueen, 1};
             modifyPiece(&pieceList, pieceToMove.id, newPiece);
 
             handleKill(&pieceList, isMoveValid, newPiece);
@@ -41,7 +43,7 @@ void handleKill(PieceList **pieceList, Move *move, Piece killingPiece)
 {
     if (move->killedPieceId != -1)
     {
-        Piece killedPiece = {move->killedPieceId, {0, 0, regular}, none, 0};
+        Piece killedPiece = {move->killedPieceId, {0, 0, regular}, none, 0, 0};
         modifyPiece(pieceList, move->killedPieceId, killedPiece);
         handleMultipleKill(*pieceList, killingPiece);
     }
@@ -57,10 +59,11 @@ void handleMultipleKill(PieceList *pieceList, Piece killingPiece)
         Move *isMoveValid = isMoveInList(possibleMoves, moveChoice.x, moveChoice.y);
         if (isMoveValid)
         {
-            killingPiece = {killingPiece.id, {moveChoice.x, moveChoice.y}, killingPiece.team, 1};
+            int isQueen = isNewQueen(killingPiece, moveChoice);
+            killingPiece = {killingPiece.id, {moveChoice.x, moveChoice.y}, killingPiece.team, isQueen, 1};
             modifyPiece(&pieceList, killingPiece.id, killingPiece);
 
-            Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, none, 0};
+            Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, none, 0, 0};
             modifyPiece(&pieceList, isMoveValid->killedPieceId, killedPiece);
 
             hasMoreKillingMoves = pieceHasKillingMoves(pieceList, killingPiece);
@@ -112,7 +115,7 @@ Piece getPieceToMove(PieceList *pieceList, Team team)
                 printColorText("That's not your piece, try another one: \a", RED);
             else
             {
-                Piece pieceToReturn = {pieceToMove->id, pieceToMove->coord, pieceToMove->team, pieceToMove->isOnGame};
+                Piece pieceToReturn = {pieceToMove->id, pieceToMove->coord, pieceToMove->team, pieceToMove->isQueen, pieceToMove->isOnGame};
                 pieceToReturn.coord.colorCode = orange; // set color code to orange to highlight in the board
                 return pieceToReturn;
             }
@@ -142,10 +145,16 @@ Team isGameOver(PieceList *pieceList)
     return whitePieces == 0 ? white : black;
 }
 
+int isNewQueen(Piece p, Coord m)
+{
+    return p.isQueen || (p.team == black && m.x == 0) || (p.team == white && m.x == 7) ? 1 : 0;
+}
+
 void printRoundInfo(Team team, PieceList *pieceList, MoveList *toHighlight)
 {
     printBoard(pieceList, toHighlight);
     printColorText(team == black ? "Playing: BLACKS\n" : "Playing: WHITES\n", GREEN);
+    printColorText("Insert Q to give up\n", GREEN);
 }
 
 #endif // ROUND

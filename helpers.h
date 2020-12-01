@@ -6,6 +6,7 @@ const char GREEN[15] = "[1m\033[32m"; // code 1
 const char BLUE[15] = "[1m\033[36m";  // code 2
 const char RED[15] = "[1m\033[31m";   // code 3
 const char ORANGE[15] = "[01;33m";    // code 4
+const char PURPLE[15] = "[1;35m";     // code 5
 
 void printColorText(const char *text, const char *color)
 {

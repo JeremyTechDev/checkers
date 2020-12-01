@@ -19,6 +19,7 @@ typedef enum Color
     blue,
     red,
     orange,
+    purple,
 } Color;
 
 typedef struct Coord
@@ -33,6 +34,7 @@ typedef struct Piece
     int id;
     Coord coord;
     Team team;
+    int isQueen;
     int isOnGame;
 } Piece;
 

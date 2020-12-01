@@ -51,7 +51,11 @@ void printSpot(PieceList *pieceList, int x, int y, Color colorCode)
 
     currentPiece = getPieceAtPosition(pieceList, x, y);
     if (currentPiece && currentPiece->isOnGame != 0)
+    {
+        if (currentPiece->isQueen)
+            setColor(PURPLE);
         printf("[%s] ", currentPiece->team == black ? "B" : "W");
+    }
     else
         colorCode ? printf(">%s ", convertCoordToText(coord)) : printf("%s ", board[x][y]);
 
@@ -70,6 +74,8 @@ void setHighlightColor(Color colorCode)
         setColor(RED);
     else if (colorCode == orange)
         setColor(ORANGE);
+    else if (colorCode == purple)
+        setColor(PURPLE);
 }
 
 #endif // BOARD

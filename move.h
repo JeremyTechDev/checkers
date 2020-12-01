@@ -9,7 +9,7 @@
 void insertMove(MoveList **, Move, Piece *);
 int isMovePossible(PieceList *, Coord);
 MoveList *getPossibleMoves(PieceList *, Piece);
-Move *getKillingMove(PieceList *, Piece, int);
+Move *getKillingMove(PieceList *, Piece, int, int);
 MoveList *checkIfKillingMoves(PieceList *, Team);
 MoveList *pieceHasKillingMoves(PieceList *, Piece);
 Move *isMoveInList(CoordList *, int, int);
@@ -69,49 +69,57 @@ int isMovePossible(PieceList *pieceList, Coord move)
 MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
 {
     MoveList *possibleMoves = NULL;
+    Coord posMove1, posMove2, posMove3, posMove4;
+    Piece *pieceAtPosMove1 = NULL, *pieceAtPosMove2 = NULL, *pieceAtPosMove3 = NULL, *pieceAtPosMove4 = NULL;
 
-    Coord posMove1 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y + 1, orange};
-    Coord posMove2 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y - 1, orange};
+    posMove1 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y + 1, orange};
+    posMove2 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y - 1, orange};
+    pieceAtPosMove1 = getPieceAtPosition(pieceList, posMove1.x, posMove1.y);
+    pieceAtPosMove2 = getPieceAtPosition(pieceList, posMove2.x, posMove2.y);
 
-    Piece *pieceAtPosMove1 = getPieceAtPosition(pieceList, posMove1.x, posMove1.y);
-    Piece *pieceAtPosMove2 = getPieceAtPosition(pieceList, posMove2.x, posMove2.y);
-
-    /**
-     * if there is a piece of the opposite team in the spot, check for killing move and append it to the list
-     * otherwise, just add the move to the list
-     */
-    if (pieceAtPosMove1 && pieceAtPosMove1->team != piece.team)
+    if (piece.isQueen)
     {
-        Move *killingMove = getKillingMove(pieceList, *pieceAtPosMove1, 1);
-        if (killingMove)
-            insertMove(&possibleMoves, *killingMove, &piece);
+        posMove3 = {piece.coord.x + (piece.team == black ? 1 : -1), piece.coord.y + 1, orange};
+        posMove4 = {piece.coord.x + (piece.team == black ? 1 : -1), piece.coord.y - 1, orange};
+        pieceAtPosMove3 = getPieceAtPosition(pieceList, posMove3.x, posMove3.y);
+        pieceAtPosMove4 = getPieceAtPosition(pieceList, posMove4.x, posMove4.y);
     }
 
-    if (pieceAtPosMove2 && pieceAtPosMove2->team != piece.team)
+    Coord posMoves[4] = {posMove1, posMove2, posMove3, posMove4};
+    Piece *piecesAtMovingPos[4] = {pieceAtPosMove1, pieceAtPosMove2, pieceAtPosMove3, pieceAtPosMove4};
+
+    for (int i = 0; i < 3; i++)
     {
-        Move *killingMove = getKillingMove(pieceList, *pieceAtPosMove2, -1);
-        if (killingMove)
-            insertMove(&possibleMoves, *killingMove, &piece);
+        if ((*(piecesAtMovingPos + i)) && (*(piecesAtMovingPos + i))->team != piece.team)
+        {
+            int increment = i % 2 == 0 ? 1 : -1; // switch between 1 and -1
+            int xIncrement = i >= 2              // if the moves belong to queen, increment in the opposite way
+                                 ? ((*(piecesAtMovingPos + i))->team == black ? -1 : 1)
+                                 : ((*(piecesAtMovingPos + i))->team == black ? 1 : -1);
+            Move *killingMove = getKillingMove(pieceList, *(*(piecesAtMovingPos + i)), increment, xIncrement);
+            if (killingMove)
+                insertMove(&possibleMoves, *killingMove, &piece);
+        }
     }
 
     // If no possible moves at this point, there are no killing moves
     if (!possibleMoves)
     {
-        Move move1 = {posMove1, NULL, -1};
-        Move move2 = {posMove2, NULL, -1};
-        if (isMovePossible(pieceList, posMove1))
-            insertMove(&possibleMoves, move1, NULL);
-        if (isMovePossible(pieceList, posMove2))
-            insertMove(&possibleMoves, move2, NULL);
+        for (int i = 0; i < 3; i++)
+        {
+            Move move = {(*(posMoves + i)), NULL, -1};
+            if (isMovePossible(pieceList, (*(posMoves + i))))
+                insertMove(&possibleMoves, move, NULL);
+        }
     }
 
     return possibleMoves;
 }
 
-Move *getKillingMove(PieceList *pieceList, Piece piece, int increment)
+Move *getKillingMove(PieceList *pieceList, Piece piece, int increment, int xIncrement)
 {
     Move *move = (Move *)malloc(sizeof(Move));
-    int x = piece.coord.x + (piece.team == black ? 1 : -1);
+    int x = piece.coord.x + xIncrement;
     int y = piece.coord.y + increment;
 
     if (!getPieceAtPosition(pieceList, x, y))
