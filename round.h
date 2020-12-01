@@ -10,6 +10,7 @@ void handleMultipleKill(PieceList *, Piece);
 Piece getPieceToMove(PieceList *, Team);
 MoveList *getRoundMoves(PieceList *, Piece *, Team);
 int isNewQueen(Piece, Coord);
+void giveUp(Team);
 Team isGameOver(PieceList *);
 
 void runRound(Team team, PieceList *pieceList)
@@ -22,12 +23,20 @@ void runRound(Team team, PieceList *pieceList)
 
     while (1)
     {
-        Coord moveChoice = getCoordsFromUser();
-        Move *isMoveValid = isMoveInList(possibleMoves, moveChoice.x, moveChoice.y);
+        Coord *moveChoice = NULL;
+
+        while (!moveChoice)
+        {
+            moveChoice = getCoordsFromUser();
+            if (!moveChoice)
+                giveUp(team);
+        }
+
+        Move *isMoveValid = isMoveInList(possibleMoves, (*moveChoice).x, (*moveChoice).y);
         if (isMoveValid)
         {
-            int isQueen = isNewQueen(pieceToMove, moveChoice);
-            Piece newPiece = {pieceToMove.id, {moveChoice.x, moveChoice.y}, team, isQueen, 1};
+            int isQueen = isNewQueen(pieceToMove, (*moveChoice));
+            Piece newPiece = {pieceToMove.id, {(*moveChoice).x, (*moveChoice).y}, team, isQueen, 1};
             modifyPiece(&pieceList, pieceToMove.id, newPiece);
 
             handleKill(&pieceList, isMoveValid, newPiece);
@@ -36,7 +45,6 @@ void runRound(Team team, PieceList *pieceList)
         else
             printColorText("That's not a possible move, try another one", RED);
     }
-    clear(0);
 }
 
 void handleKill(PieceList **pieceList, Move *move, Piece killingPiece)
@@ -55,12 +63,20 @@ void handleMultipleKill(PieceList *pieceList, Piece killingPiece)
     while (hasMoreKillingMoves)
     {
         MoveList *possibleMoves = getRoundMoves(pieceList, &killingPiece, killingPiece.team);
-        Coord moveChoice = getCoordsFromUser();
-        Move *isMoveValid = isMoveInList(possibleMoves, moveChoice.x, moveChoice.y);
+        Coord *moveChoice = NULL;
+
+        while (!moveChoice)
+        {
+            moveChoice = getCoordsFromUser();
+            if (!moveChoice)
+                giveUp(killingPiece.team);
+        }
+
+        Move *isMoveValid = isMoveInList(possibleMoves, (*moveChoice).x, (*moveChoice).y);
         if (isMoveValid)
         {
-            int isQueen = isNewQueen(killingPiece, moveChoice);
-            killingPiece = {killingPiece.id, {moveChoice.x, moveChoice.y}, killingPiece.team, isQueen, 1};
+            int isQueen = isNewQueen(killingPiece, (*moveChoice));
+            killingPiece = {killingPiece.id, {(*moveChoice).x, (*moveChoice).y}, killingPiece.team, isQueen, 1};
             modifyPiece(&pieceList, killingPiece.id, killingPiece);
 
             Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, none, 0, 0};
@@ -101,13 +117,19 @@ MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Team team)
 
 Piece getPieceToMove(PieceList *pieceList, Team team)
 {
-    Coord pieceChoice;
-    Piece *pieceToMove;
+    Coord *pieceChoice = NULL;
+    Piece *pieceToMove = NULL;
 
     while (1)
     {
-        pieceChoice = getCoordsFromUser();
-        pieceToMove = getPieceAtPosition(pieceList, pieceChoice.x, pieceChoice.y);
+        while (!pieceChoice)
+        {
+            pieceChoice = getCoordsFromUser();
+            if (!pieceChoice)
+                giveUp(team);
+        }
+
+        pieceToMove = getPieceAtPosition(pieceList, (*pieceChoice).x, (*pieceChoice).y);
 
         if (pieceToMove)
         {
@@ -142,7 +164,29 @@ Team isGameOver(PieceList *pieceList)
 
     if (whitePieces != 0 && blackPieces != 0)
         return none;
-    return whitePieces == 0 ? white : black;
+    return whitePieces == 0 ? black : white;
+}
+
+void giveUp(Team givingUp)
+{
+    char giveUp = 0;
+    printColorText("\nAre you sure you want to give up? [y/n]: \n", RED);
+
+    while (1)
+    {
+        scanf(" %c", &giveUp);
+        getchar();
+
+        if (tolower(giveUp) == 'y')
+        {
+            printf(givingUp == black ? "Black gives up!\n" : "White gives up!\n");
+            printf(givingUp == black ? "White wins!\n" : "Black wins!\n");
+            exit(0);
+        }
+        else if (tolower(giveUp) == 'n')
+            break;
+    }
+    printColorText("Canceled! Continue playing...\n", GREEN);
 }
 
 int isNewQueen(Piece p, Coord m)

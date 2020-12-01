@@ -6,7 +6,7 @@
 #include "structs.h"
 #include "helpers.h"
 
-Coord getCoordsFromUser();
+Coord *getCoordsFromUser();
 void insertCoord(CoordList **, Coord);
 char *convertCoordToText(Coord);
 void printTextCoord(MoveList *);
@@ -14,7 +14,7 @@ void printTextCoord(MoveList *);
 /**
  * Gets a valid [x,y] cord from the user 
  */
-Coord getCoordsFromUser()
+Coord *getCoordsFromUser()
 {
     int xCord, yCord;
     char input[10];
@@ -27,12 +27,8 @@ Coord getCoordsFromUser()
         char letter = toupper(*input);
         int number = *(input + 1) - '0';
 
-        if (letter == 'Q')
-        {
-            clear(0);
-            printf("\nGame Stopped!\n");
-            exit(0);
-        }
+        if (letter == 'Q') // player gives up
+            return NULL;
 
         xCord = number - 1;
         yCord = (int)(strchr(validLetters, letter) - validLetters);
@@ -43,7 +39,10 @@ Coord getCoordsFromUser()
         printColorText("Invalid coord, try another one: ", RED);
     }
 
-    Coord coord = {xCord, yCord, orange};
+    Coord *coord = (Coord *)malloc(sizeof(Coord));
+    coord->x = xCord;
+    coord->y = yCord;
+    coord->colorCode = orange;
     return coord;
 }
 

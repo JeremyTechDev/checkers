@@ -11,17 +11,19 @@
 
 int main(int argc, char const *argv[])
 {
-    Team currentRoundTeam = black;
+    Team currentRoundTeam = black, winner;
     PieceList *pieceList = initializePieces();
 
     while (1)
     {
         runRound(currentRoundTeam, pieceList);
-        if (isGameOver(pieceList) != none)
+        winner = isGameOver(pieceList);
+        if (winner != none)
         {
-            printColorText("Game over!\n", RED);
+            printf("Game over!\n%s", winner == black ? "Black wins!\n" : "White wins!\n");
             exit(0);
         }
+        clear(0);
         currentRoundTeam = currentRoundTeam == black ? white : black;
     }
 
