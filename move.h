@@ -1,7 +1,6 @@
 #if !defined(MOVE)
 #define MOVE
 
-#include <string.h>
 #include "structs.h"
 #include "piece.h"
 #include "coord.h"
@@ -16,11 +15,13 @@ Move *isMoveInList(CoordList *, int, int);
 
 /**
  * Inserts a move into the move list
+ * @param {MoveList **} - all the moves
+ * @param {Move} move - the move to add
+ * @param {Piece *} killingPiece - the piece thats killing or null
  */
 void insertMove(MoveList **moveList, Move move, Piece *killingPiece)
 {
     MoveList *node = (MoveList *)malloc(sizeof(MoveList));
-
     if (node == NULL)
     {
         printf("No space for the new move...\n");
@@ -32,39 +33,22 @@ void insertMove(MoveList **moveList, Move move, Piece *killingPiece)
     node->next = NULL;
     node->prev = NULL;
 
-    // insert in the first position
-    if (*moveList == NULL)
+    if (*moveList == NULL) // insert in the first position
     {
         *moveList = node;
         return;
     }
 
-    // inserting at first position (push)
-    node->next = *moveList;
+    node->next = *moveList; // inserting at first position (push)
     (*moveList)->prev = node;
     *moveList = node;
 }
 
 /**
- * Returns whether a move is possible or not
- */
-int isMovePossible(PieceList *pieceList, Coord move)
-{
-    if (move.x > 7 || move.x < 0)
-        return 0;
-
-    if (move.y > 7 || move.y < 0)
-        return 0;
-
-    Piece *isTaken = getPieceAtPosition(pieceList, move.x, move.y);
-    if (isTaken)
-        return 0;
-
-    return 1;
-}
-
-/**
  * Returns all the posible moves for a piece
+ * @param {PieceList *} pieceList - all the pieces
+ * @param {Piece} piece - the piece to looks moves from
+ * @returns {MoveList *} - the list of possible moves
  */
 MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
 {
@@ -102,8 +86,7 @@ MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
         }
     }
 
-    // If no possible moves at this point, there are no killing moves
-    if (!possibleMoves)
+    if (!possibleMoves) // If no possible moves at this point, there are no killing moves
     {
         for (int i = 0; i < 3; i++)
         {
@@ -112,10 +95,17 @@ MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
                 insertMove(&possibleMoves, move, NULL);
         }
     }
-
     return possibleMoves;
 }
 
+/**
+ * Returns the killing move for a piece
+ * @param {PieceList *} pieceList - all the pieces
+ * @param {Piece} piece - the piece to looks moves from
+ * @param {int} increment - increment in y coord
+ * @param {int} xIncrement - increment in x coord
+ * @returns {Move *} the killing move or null
+ */
 Move *getKillingMove(PieceList *pieceList, Piece piece, int increment, int xIncrement)
 {
     Move *move = (Move *)malloc(sizeof(Move));
@@ -129,14 +119,15 @@ Move *getKillingMove(PieceList *pieceList, Piece piece, int increment, int xIncr
         move->killingPiece = NULL;
         if (isMovePossible(pieceList, move->coord))
             return move;
-        return NULL;
     }
-
     return NULL;
 }
 
 /**
  * Returns a piece to move in case there is a killing move for a team
+ * @param {PieceList *} pieceList - all the pieces
+ * @param {Team} team - round's team
+ * @returns {MoveList *} - the list of possible killing moves
  */
 MoveList *checkIfKillingMoves(PieceList *pieceList, Team team)
 {
@@ -165,22 +156,30 @@ MoveList *checkIfKillingMoves(PieceList *pieceList, Team team)
     return NULL;
 }
 
+/**
+ * Returns if a piece has killing moves or not
+ * @param {PieceList *} pieceList - all the pieces
+ * @param {Piece} piece - the piece to looks moves from
+ * @returns {MoveList *} - the list of possible killing moves
+ */
 MoveList *pieceHasKillingMoves(PieceList *pieceList, Piece piece)
 {
     MoveList *possibleMoves = getPossibleMoves(pieceList, piece), *result = NULL;
-
     while (possibleMoves)
     {
         if (possibleMoves->move.killedPieceId != -1)
             insertMove(&result, possibleMoves->move, &piece);
         possibleMoves = possibleMoves->next;
     }
-
     return result;
 }
 
 /**
  * Returns whether a move is in the given move list
+ * @param {MoveList *} moveList - the list of moves
+ * @param {int} x - the x coord
+ * @param {int} y - the y coord
+ * @returns {Move *} the move or null
  */
 Move *isMoveInList(MoveList *moveList, int x, int y)
 {
@@ -190,15 +189,31 @@ Move *isMoveInList(MoveList *moveList, int x, int y)
         {
             Move *move = (Move *)malloc(sizeof(Move));
             move->killingPiece = moveList->move.killingPiece;
-            move->coord.x = moveList->move.coord.x;
-            move->coord.y = moveList->move.coord.y;
-            move->coord.colorCode = moveList->move.coord.colorCode;
+            move->coord = moveList->move.coord;
             move->killedPieceId = moveList->move.killedPieceId;
             return move;
         }
         moveList = moveList->next;
     }
     return NULL;
+}
+
+/**
+ * Returns whether a move is possible or not
+ * @param {PieceList *} pieceList - all the pieces
+ * @param {Move} move - the move to validate
+ * @returns {int} whether a move is possible or not
+ */
+int isMovePossible(PieceList *pieceList, Coord move)
+{
+    if (move.x > 7 || move.x < 0)
+        return 0;
+    if (move.y > 7 || move.y < 0)
+        return 0;
+    Piece *isTaken = getPieceAtPosition(pieceList, move.x, move.y);
+    if (isTaken)
+        return 0;
+    return 1;
 }
 
 #endif // MOVE

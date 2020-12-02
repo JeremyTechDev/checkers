@@ -1,18 +1,20 @@
 #if !defined(PIECE)
 #define PIECE
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "helpers.h"
 #include "structs.h"
+#include "coord.h"
 
 void insertPiece(PieceList **, Piece);
 PieceList *initializePieces();
 Piece *getPieceAtPosition(PieceList *, int, int);
+Piece getPieceToMove(PieceList *, Team);
 void modifyPiece(PieceList **, int, Piece);
+int isQueen(Piece, Coord);
 
 /**
  * Adds all the pieces to the Piece List
+ * @returns {PieceList *} - all the pieces of the game
  */
 PieceList *initializePieces()
 {
@@ -54,11 +56,12 @@ PieceList *initializePieces()
 
 /**
  * Insert a piece into the piece list
+ * @param {PieceList **} - all the pieces of the game
+ * @param {Piece} piece - the piece to add
  */
 void insertPiece(PieceList **pieceList, Piece piece)
 {
     PieceList *node = (PieceList *)malloc(sizeof(PieceList));
-
     if (node == NULL)
     {
         printf("No space for the new piece\n");
@@ -69,26 +72,27 @@ void insertPiece(PieceList **pieceList, Piece piece)
     node->next = NULL;
     node->prev = NULL;
 
-    // insert in the first position
-    if (*pieceList == NULL)
+    if (*pieceList == NULL) // insert in the first position
+
     {
         *pieceList = node;
         return;
     }
 
-    // inserting at first position (push)
-    node->next = *pieceList;
+    node->next = *pieceList; // inserting at first position (push)
     (*pieceList)->prev = node;
     *pieceList = node;
 }
 
 /**
  * Finds by id a piece in the piece list and changes it
+ * @param {PieceList **} - all the pieces of the game
+ * @param {int} id - the id of the piece to change
+ * @param {Piece} piece - the new piece
  */
 void modifyPiece(PieceList **pieceList, int id, Piece piece)
 {
     PieceList *firstPos = *pieceList;
-
     while (*pieceList)
     {
         if ((*pieceList)->piece.id == id)
@@ -103,6 +107,10 @@ void modifyPiece(PieceList **pieceList, int id, Piece piece)
 
 /**
  * If there is a piece in the position [x, y], it returns it, NULL otherwise
+ * @param {PieceList *} - all the pieces of the game
+ * @param {int} x - x coord
+ * @param {int} y - y coord
+ * @returns {Piece *} the piece at pos [x,y] or null
  */
 Piece *getPieceAtPosition(PieceList *pieceList, int x, int y)
 {
@@ -124,6 +132,17 @@ Piece *getPieceAtPosition(PieceList *pieceList, int x, int y)
         node = node->next;
     }
     return NULL;
+}
+
+/**
+ * Checks if a piece is a queen
+ * @param {Piece} p - the piece to check if queen
+ * @param {Coord} c - the new coord of the piece
+ * @returns {int} whether the piece is queen or not
+ */
+int isQueen(Piece p, Coord c)
+{
+    return p.isQueen || (p.team == black && c.x == 0) || (p.team == white && c.x == 7) ? 1 : 0;
 }
 
 #endif // PIECE

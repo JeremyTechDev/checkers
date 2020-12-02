@@ -1,18 +1,15 @@
 #if !defined(COORDS)
 #define COORDS
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "structs.h"
-#include "helpers.h"
-
 Coord *getCoordsFromUser();
 void insertCoord(CoordList **, Coord);
 char *convertCoordToText(Coord);
 void printTextCoord(MoveList *);
+int isMovePossible(PieceList *, Coord);
 
 /**
- * Gets a valid [x,y] cord from the user 
+ * Gets a valid [x,y] cord from the user or NULL if the user wants to give up
+ * @returns {Coord *} NULL or valid coord from the user
  */
 Coord *getCoordsFromUser()
 {
@@ -48,14 +45,16 @@ Coord *getCoordsFromUser()
 
 /**
  * Inserts a coord into the coords list
+ * @param {CoordList **} coordsList - double linked list with all the coords so far
+ * @param {Coord} coord - the coord to insert
  */
 void insertCoord(CoordList **coordsList, Coord coord)
 {
     CoordList *node = (CoordList *)malloc(sizeof(CoordList));
 
-    if (node == NULL)
+    if (!node)
     {
-        printf("No space for the new coord...\n");
+        printColorText("No space for the new coord...\n", RED);
         exit(-1);
     }
 
@@ -78,21 +77,20 @@ void insertCoord(CoordList **coordsList, Coord coord)
 
 /**
  * Converts a [x,y] coord to @# text
+ * @param {Coord} coord - the coord to convert to text
+ * @returns {char *} the text value of coord
  */
 char *convertCoordToText(Coord coord)
 {
-    char letter = (char)validLetters[coord.y];
-    char number = (char)((coord.x + 1) + '0');
-
     char *result = (char *)malloc(sizeof(char) * 3);
-    *(result) = letter;
-    *(result + 1) = number;
-
+    *(result) = (char)validLetters[coord.y];
+    *(result + 1) = (char)((coord.x + 1) + '0');
     return result;
 }
 
 /**
  * Prints a list of text coords
+ * @param {MoveList *} moveList - all the moves to print
  */
 void printTextCoord(MoveList *moveList)
 {

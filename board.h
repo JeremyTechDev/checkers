@@ -8,9 +8,13 @@
 #include "coord.h"
 
 void printBoard(PieceList *, MoveList *);
-void printSpot(PieceList *, int, int, Color);
-void setHighlightColor(Color);
+void printSpot(PieceList *, Coord);
 
+/**
+ * Prints a colored board with all the active pieces and the current state of the game
+ * @param {PieceList*} pieceList - all pieces of the game
+ * @param {MoveList*} coordsToHighlight - all coords to highlight with color
+ */
 void printBoard(PieceList *pieceList, MoveList *coordsToHighlight)
 {
     printColorText("Checkers Game!\n\n", GREEN);
@@ -22,60 +26,33 @@ void printBoard(PieceList *pieceList, MoveList *coordsToHighlight)
 
         for (int y = 0; y < 8; y++)
         {
-            if (coordsToHighlight)
-            {
-                Move *hasHighlight = isMoveInList(coordsToHighlight, x, y);
-                if (hasHighlight)
-                    printSpot(pieceList, x, y, hasHighlight->coord.colorCode);
-                else
-                    printSpot(pieceList, x, y, regular);
-            }
+            Move *hasHighlight = isMoveInList(coordsToHighlight, x, y);
+            if (coordsToHighlight && hasHighlight)
+                printSpot(pieceList, {x, y, hasHighlight->coord.colorCode});
             else
-                printSpot(pieceList, x, y, regular);
+                printSpot(pieceList, {x, y, regular});
         }
         printf("\n");
     }
-
     printColorText("   A   B   C   D   E   F   G   H\n\n", GREEN);
 }
 
 /**
  * Prints a custom spot of the board
+ * @param {PieceList*} pieceList - all pieces of the game
+ * @param {int} x - x value of coord
+ * @param {int} y - y value of coord
  */
-void printSpot(PieceList *pieceList, int x, int y, Color colorCode)
+void printSpot(PieceList *pieceList, Coord coord)
 {
-    Coord coord = {x, y, colorCode};
-    Piece *currentPiece = (Piece *)malloc(sizeof(Piece));
+    Piece *currentPiece = getPieceAtPosition(pieceList, coord.x, coord.y);
 
-    setHighlightColor(colorCode);
-
-    currentPiece = getPieceAtPosition(pieceList, x, y);
+    setHighlightColor(currentPiece && currentPiece->isQueen ? purple : coord.colorCode);
     if (currentPiece && currentPiece->isOnGame != 0)
-    {
-        if (currentPiece->isQueen)
-            setColor(PURPLE);
         printf("[%s] ", currentPiece->team == black ? "B" : "W");
-    }
     else
-        colorCode ? printf(">%s ", convertCoordToText(coord)) : printf("%s ", board[x][y]);
-
-    setColor(REGULAR);
-}
-
-void setHighlightColor(Color colorCode)
-{
-    if (colorCode == regular)
-        setColor(REGULAR);
-    else if (colorCode == green)
-        setColor(GREEN);
-    else if (colorCode == blue)
-        setColor(BLUE);
-    else if (colorCode == red)
-        setColor(RED);
-    else if (colorCode == orange)
-        setColor(ORANGE);
-    else if (colorCode == purple)
-        setColor(PURPLE);
+        coord.colorCode ? printf(">%s ", convertCoordToText(coord)) : printf("%s ", board[coord.x][coord.y]);
+    setHighlightColor(regular);
 }
 
 #endif // BOARD

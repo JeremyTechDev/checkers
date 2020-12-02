@@ -1,18 +1,20 @@
 #if !defined(ROUND)
 #define ROUND
 
-#include "structs.h"
-
 void runRound(Team, PieceList *);
 void printRoundInfo(Team, PieceList *, MoveList *);
-void handleKill(PieceList **, Move *, Piece);
+void handleKill(PieceList **, int, Piece);
 void handleMultipleKill(PieceList *, Piece);
-Piece getPieceToMove(PieceList *, Team);
 MoveList *getRoundMoves(PieceList *, Piece *, Team);
-int isNewQueen(Piece, Coord);
-void giveUp(Team);
+Piece getPieceToMove(PieceList *, Team);
+void endGame(Team);
 Team isGameOver(PieceList *);
 
+/**
+ * Runs a full round for one team
+ * @param {Team} team - team playing in the round
+ * @param {PieceList *} pieceList - all pieces in the game
+ */
 void runRound(Team team, PieceList *pieceList)
 {
     printRoundInfo(team, pieceList, NULL);
@@ -29,17 +31,15 @@ void runRound(Team team, PieceList *pieceList)
         {
             moveChoice = getCoordsFromUser();
             if (!moveChoice)
-                giveUp(team);
+                endGame(team);
         }
 
         Move *isMoveValid = isMoveInList(possibleMoves, (*moveChoice).x, (*moveChoice).y);
         if (isMoveValid)
         {
-            int isQueen = isNewQueen(pieceToMove, (*moveChoice));
-            Piece newPiece = {pieceToMove.id, {(*moveChoice).x, (*moveChoice).y}, team, isQueen, 1};
+            Piece newPiece = {pieceToMove.id, {(*moveChoice).x, (*moveChoice).y}, team, isQueen(pieceToMove, (*moveChoice)), 1};
             modifyPiece(&pieceList, pieceToMove.id, newPiece);
-
-            handleKill(&pieceList, isMoveValid, newPiece);
+            handleKill(&pieceList, isMoveValid->killedPieceId, newPiece);
             break;
         }
         else
@@ -47,16 +47,27 @@ void runRound(Team team, PieceList *pieceList)
     }
 }
 
-void handleKill(PieceList **pieceList, Move *move, Piece killingPiece)
+/**
+ * Kills a piece
+ * @param {PieceList **} pieceList - all pieces in game
+ * @param {int} killedPieceId - the id of the piece to kill, -1 to kill no piece 
+ * @param {Piece} killingPiece - the piece making the kill
+ */
+void handleKill(PieceList **pieceList, int killedPieceId, Piece killingPiece)
 {
-    if (move->killedPieceId != -1)
+    if (killedPieceId != -1)
     {
-        Piece killedPiece = {move->killedPieceId, {0, 0, regular}, none, 0, 0};
-        modifyPiece(pieceList, move->killedPieceId, killedPiece);
+        Piece killedPiece = {killedPieceId, {0, 0, regular}, none, 0, 0};
+        modifyPiece(pieceList, killedPieceId, killedPiece);
         handleMultipleKill(*pieceList, killingPiece);
     }
 }
 
+/**
+ * Check and runs if its possible to make a multiple kill movement
+ * @param {PieceList *} pieceList - all pieces in game
+ * @param {Piece} killingPiece - the piece making the kills
+ */
 void handleMultipleKill(PieceList *pieceList, Piece killingPiece)
 {
     MoveList *hasMoreKillingMoves = pieceHasKillingMoves(pieceList, killingPiece);
@@ -69,26 +80,32 @@ void handleMultipleKill(PieceList *pieceList, Piece killingPiece)
         {
             moveChoice = getCoordsFromUser();
             if (!moveChoice)
-                giveUp(killingPiece.team);
+                endGame(killingPiece.team);
         }
 
         Move *isMoveValid = isMoveInList(possibleMoves, (*moveChoice).x, (*moveChoice).y);
         if (isMoveValid)
         {
-            int isQueen = isNewQueen(killingPiece, (*moveChoice));
-            killingPiece = {killingPiece.id, {(*moveChoice).x, (*moveChoice).y}, killingPiece.team, isQueen, 1};
-            modifyPiece(&pieceList, killingPiece.id, killingPiece);
+            killingPiece = {killingPiece.id, {(*moveChoice).x, (*moveChoice).y}, killingPiece.team, isQueen(killingPiece, (*moveChoice)), 1};
+            modifyPiece(&pieceList, killingPiece.id, killingPiece); // move to killing coord
 
             Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, none, 0, 0};
-            modifyPiece(&pieceList, isMoveValid->killedPieceId, killedPiece);
+            modifyPiece(&pieceList, isMoveValid->killedPieceId, killedPiece); // remove killed from game
 
-            hasMoreKillingMoves = pieceHasKillingMoves(pieceList, killingPiece);
+            hasMoreKillingMoves = pieceHasKillingMoves(pieceList, killingPiece); // re-check for more kills
         }
         else
             printColorText("That's not a possible move, try another one", RED);
     }
 }
 
+/**
+ * Gets all the possible moves for a round
+ * @param {PieceList *} pieceList - all pieces in game
+ * @param {Piece *} pieceToMove - piece to move
+ * @param {Team} team - team's round
+ * @returns {MoveList *} all the possible moves or NULL
+ */
 MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Team team)
 {
     int i = 0;
@@ -111,44 +128,13 @@ MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Team team)
     system("clear");
     printRoundInfo(team, pieceList, toHighlight);
     printTextCoord(possibleMoves);
-
     return possibleMoves;
-}
-
-Piece getPieceToMove(PieceList *pieceList, Team team)
-{
-    Coord *pieceChoice = NULL;
-    Piece *pieceToMove = NULL;
-
-    while (1)
-    {
-        while (!pieceChoice)
-        {
-            pieceChoice = getCoordsFromUser();
-            if (!pieceChoice)
-                giveUp(team);
-        }
-
-        pieceToMove = getPieceAtPosition(pieceList, (*pieceChoice).x, (*pieceChoice).y);
-
-        if (pieceToMove)
-        {
-            if (pieceToMove->team != team)
-                printColorText("That's not your piece, try another one: \a", RED);
-            else
-            {
-                Piece pieceToReturn = {pieceToMove->id, pieceToMove->coord, pieceToMove->team, pieceToMove->isQueen, pieceToMove->isOnGame};
-                pieceToReturn.coord.colorCode = orange; // set color code to orange to highlight in the board
-                return pieceToReturn;
-            }
-        }
-        else
-            printColorText("No piece at that coord, try another one: \a", RED);
-    }
 }
 
 /**
  * Returns the winner, if there is one
+ * @param {PieceList *} pieceList - all pieces in game
+ * @returns {Team} the team that won or none
  */
 Team isGameOver(PieceList *pieceList)
 {
@@ -161,16 +147,18 @@ Team isGameOver(PieceList *pieceList)
             blackPieces++;
         pieceList = pieceList->next;
     }
-
     if (whitePieces != 0 && blackPieces != 0)
         return none;
     return whitePieces == 0 ? black : white;
 }
 
-void giveUp(Team givingUp)
+/**
+ * Check whether the user want to give up or ask to draw
+ * @param {Team} givingUp - the team that wants to end the game
+ */
+void endGame(Team givingUp)
 {
     char giveUp, option;
-
     printColorText("Ask to draw (D) or give up (G)?\n", RED);
 
     while (1)
@@ -198,7 +186,6 @@ void giveUp(Team givingUp)
             printColorText("Canceled! Continue playing...\nChoose the piece to move\n", GREEN);
             break;
         }
-
         if (tolower(option) == 'g')
         {
             printColorText("\nAre you sure you want to give up? [y/n]: \n", RED);
@@ -223,11 +210,47 @@ void giveUp(Team givingUp)
     }
 }
 
-int isNewQueen(Piece p, Coord m)
+/**
+ * Returns the piece the user wants to move
+ * @param {PieceList **} pieceList - all pieces in game
+ * @param {Team} team - team's round
+ */
+Piece getPieceToMove(PieceList *pieceList, Team team)
 {
-    return p.isQueen || (p.team == black && m.x == 0) || (p.team == white && m.x == 7) ? 1 : 0;
+    Coord *pieceChoice = NULL;
+    Piece *pieceToMove = NULL;
+
+    while (1)
+    {
+        while (!pieceChoice)
+        {
+            pieceChoice = getCoordsFromUser();
+            if (!pieceChoice)
+                endGame(team);
+        }
+        pieceToMove = getPieceAtPosition(pieceList, (*pieceChoice).x, (*pieceChoice).y);
+        if (pieceToMove)
+        {
+            if (pieceToMove->team != team)
+                printColorText("That's not your piece, try another one: \a", RED);
+            else
+            {
+                Piece pieceToReturn = {pieceToMove->id, pieceToMove->coord, pieceToMove->team, pieceToMove->isQueen, pieceToMove->isOnGame};
+                pieceToReturn.coord.colorCode = orange; // set color code to orange to highlight in the board
+                return pieceToReturn;
+            }
+        }
+        else
+            printColorText("No piece at that coord, try another one: \a", RED);
+    }
 }
 
+/**
+ * Print round info
+ * @param {Team} team - team's round
+ * @param {PieceList *} pieceList - all pieces in game
+ * @param {MoveList *} toHighlight - coords to highlight
+ */
 void printRoundInfo(Team team, PieceList *pieceList, MoveList *toHighlight)
 {
     printBoard(pieceList, toHighlight);
