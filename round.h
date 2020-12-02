@@ -1,14 +1,11 @@
 #if !defined(ROUND)
 #define ROUND
 
-void runRound(Team, PieceList *);
-void printRoundInfo(Team, PieceList *, MoveList *);
-void handleKill(PieceList **, int, Piece);
-void handleMultipleKill(PieceList *, Piece);
 MoveList *getRoundMoves(PieceList *, Piece *, Team);
 Piece getPieceToMove(PieceList *, Team);
-void endGame(Team);
-Team isGameOver(PieceList *);
+void handleKill(PieceList **, int, Piece);
+void handleMultipleKill(PieceList *, Piece);
+void runRound(Team, PieceList *);
 
 /**
  * Runs a full round for one team
@@ -19,14 +16,12 @@ void runRound(Team team, PieceList *pieceList)
 {
     printRoundInfo(team, pieceList, NULL);
     printColorText("Choose the piece you want to move: ", BLUE);
-
     Piece pieceToMove;
     MoveList *possibleMoves = getRoundMoves(pieceList, &pieceToMove, team);
 
     while (1)
     {
         Coord *moveChoice = NULL;
-
         while (!moveChoice)
         {
             moveChoice = getCoordsFromUser();
@@ -113,7 +108,6 @@ MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Team team)
     if (possibleMoves)
         *pieceToMove = *possibleMoves->move.killingPiece;
     else
-    {
         while (!possibleMoves) // loop until a possible move is found
         {
             if (i++)
@@ -121,7 +115,7 @@ MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Team team)
             *pieceToMove = getPieceToMove(pieceList, team);
             possibleMoves = getPossibleMoves(pieceList, *pieceToMove);
         }
-    }
+
     MoveList *toHighlight = possibleMoves; // insert the selected piece to highlight
     insertMove(&toHighlight, {pieceToMove->coord, pieceToMove, -1}, NULL);
 
@@ -129,85 +123,6 @@ MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Team team)
     printRoundInfo(team, pieceList, toHighlight);
     printTextCoord(possibleMoves);
     return possibleMoves;
-}
-
-/**
- * Returns the winner, if there is one
- * @param {PieceList *} pieceList - all pieces in game
- * @returns {Team} the team that won or none
- */
-Team isGameOver(PieceList *pieceList)
-{
-    int whitePieces = 0, blackPieces = 0;
-    while (pieceList)
-    {
-        if (pieceList->piece.team == white)
-            whitePieces++;
-        if (pieceList->piece.team == black)
-            blackPieces++;
-        pieceList = pieceList->next;
-    }
-    if (whitePieces != 0 && blackPieces != 0)
-        return none;
-    return whitePieces == 0 ? black : white;
-}
-
-/**
- * Check whether the user want to give up or ask to draw
- * @param {Team} givingUp - the team that wants to end the game
- */
-void endGame(Team givingUp)
-{
-    char giveUp, option;
-    printColorText("Ask to draw (D) or give up (G)?\n", RED);
-
-    while (1)
-    {
-        printColorText(">>> ", RED);
-        scanf(" %c", &option);
-        getchar();
-
-        if (tolower(option) == 'd')
-        {
-            printColorText("Asking to draw! Insert Y if both players agree to draw, anything else to cancel: \n", RED);
-            while (1)
-            {
-                printColorText(">>> ", RED);
-                scanf(" %c", &giveUp);
-                getchar();
-
-                if (tolower(giveUp) == 'y')
-                {
-                    printf("Match end with a draw!\n");
-                    exit(0);
-                }
-                break;
-            }
-            printColorText("Canceled! Continue playing...\nChoose the piece to move\n", GREEN);
-            break;
-        }
-        if (tolower(option) == 'g')
-        {
-            printColorText("\nAre you sure you want to give up? [y/n]: \n", RED);
-            while (1)
-            {
-                printColorText(">>> ", RED);
-                scanf(" %c", &giveUp);
-                getchar();
-
-                if (tolower(giveUp) == 'y')
-                {
-                    printf(givingUp == black ? "Black gives up!\n" : "White gives up!\n");
-                    printf(givingUp == black ? "White wins!\n" : "Black wins!\n");
-                    exit(0);
-                }
-                else if (tolower(giveUp) == 'n')
-                    break;
-            }
-            printColorText("Canceled! Continue playing...\nChoose the piece/coord to move\n", GREEN);
-            break;
-        }
-    }
 }
 
 /**
@@ -243,19 +158,6 @@ Piece getPieceToMove(PieceList *pieceList, Team team)
         else
             printColorText("No piece at that coord, try another one: \a", RED);
     }
-}
-
-/**
- * Print round info
- * @param {Team} team - team's round
- * @param {PieceList *} pieceList - all pieces in game
- * @param {MoveList *} toHighlight - coords to highlight
- */
-void printRoundInfo(Team team, PieceList *pieceList, MoveList *toHighlight)
-{
-    printBoard(pieceList, toHighlight);
-    printColorText(team == black ? "Playing: BLACKS\n" : "Playing: WHITES\n", GREEN);
-    printColorText("Insert Q to give up or ask to draw\n", GREEN);
 }
 
 #endif // ROUND

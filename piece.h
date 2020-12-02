@@ -5,12 +5,12 @@
 #include "structs.h"
 #include "coord.h"
 
-void insertPiece(PieceList **, Piece);
-PieceList *initializePieces();
+int isQueen(Piece, Coord);
 Piece *getPieceAtPosition(PieceList *, int, int);
 Piece getPieceToMove(PieceList *, Team);
+PieceList *initializePieces();
+void insertPiece(PieceList **, Piece);
 void modifyPiece(PieceList **, int, Piece);
-int isQueen(Piece, Coord);
 
 /**
  * Adds all the pieces to the Piece List
@@ -115,15 +115,13 @@ void modifyPiece(PieceList **pieceList, int id, Piece piece)
 Piece *getPieceAtPosition(PieceList *pieceList, int x, int y)
 {
     PieceList *node = pieceList;
-
     while (node != NULL)
     {
         if (node->piece.coord.x == x && node->piece.coord.y == y && node->piece.isOnGame == 1)
         {
             Piece *piece = (Piece *)malloc(sizeof(Piece));
             piece->id = node->piece.id;
-            piece->coord.x = node->piece.coord.x;
-            piece->coord.y = node->piece.coord.y;
+            piece->coord = node->piece.coord;
             piece->team = node->piece.team;
             piece->isQueen = node->piece.isQueen;
             piece->isOnGame = 1;

@@ -9,6 +9,7 @@
 
 void printBoard(PieceList *, MoveList *);
 void printSpot(PieceList *, Coord);
+void printRoundInfo(Team, PieceList *, MoveList *);
 
 /**
  * Prints a colored board with all the active pieces and the current state of the game
@@ -46,7 +47,6 @@ void printBoard(PieceList *pieceList, MoveList *coordsToHighlight)
 void printSpot(PieceList *pieceList, Coord coord)
 {
     Piece *currentPiece = getPieceAtPosition(pieceList, coord.x, coord.y);
-
     setHighlightColor(currentPiece && currentPiece->isQueen ? purple : coord.colorCode);
     if (currentPiece && currentPiece->isOnGame != 0)
         printf("[%s] ", currentPiece->team == black ? "B" : "W");
@@ -55,4 +55,16 @@ void printSpot(PieceList *pieceList, Coord coord)
     setHighlightColor(regular);
 }
 
+/**
+ * Print round info
+ * @param {Team} team - team's round
+ * @param {PieceList *} pieceList - all pieces in game
+ * @param {MoveList *} toHighlight - coords to highlight
+ */
+void printRoundInfo(Team team, PieceList *pieceList, MoveList *toHighlight)
+{
+    printBoard(pieceList, toHighlight);
+    printColorText(team == black ? "Playing: BLACKS\n" : "Playing: WHITES\n", GREEN);
+    printColorText("Insert Q to give up or ask to draw\n", GREEN);
+}
 #endif // BOARD

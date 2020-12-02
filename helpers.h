@@ -8,10 +8,12 @@ const char RED[15] = "[1m\033[31m";   // code 3
 const char ORANGE[15] = "[01;33m";    // code 4
 const char PURPLE[15] = "[1;35m";     // code 5
 
+Team isGameOver(PieceList *);
+void clear(int);
+void endGame(Team);
 void printColorText(const char *, const char *);
-void setHighlightColor(Color);
 void setColor(const char *);
-void clear(int wait);
+void setHighlightColor(Color);
 
 /**
  * Print a text with a given color
@@ -66,4 +68,84 @@ void clear(int wait)
     }
     system("clear");
 }
+
+/**
+ * Check whether the user want to give up or ask to draw
+ * @param {Team} givingUp - the team that wants to end the game
+ */
+void endGame(Team givingUp)
+{
+    char giveUp, option;
+    printColorText("Ask to draw (D) or give up (G)?\n", RED);
+
+    while (1)
+    {
+        printColorText(">>> ", RED);
+        scanf(" %c", &option);
+        getchar();
+
+        if (tolower(option) == 'd')
+        {
+            printColorText("Asking to draw! Insert Y if both players agree to draw, anything else to cancel: \n", RED);
+            while (1)
+            {
+                printColorText(">>> ", RED);
+                scanf(" %c", &giveUp);
+                getchar();
+
+                if (tolower(giveUp) == 'y')
+                {
+                    printf("Match end with a draw!\n");
+                    exit(0);
+                }
+                break;
+            }
+            printColorText("Canceled! Continue playing...\nChoose the piece to move\n", GREEN);
+            break;
+        }
+        if (tolower(option) == 'g')
+        {
+            printColorText("\nAre you sure you want to give up? [y/n]: \n", RED);
+            while (1)
+            {
+                printColorText(">>> ", RED);
+                scanf(" %c", &giveUp);
+                getchar();
+
+                if (tolower(giveUp) == 'y')
+                {
+                    printf(givingUp == black ? "Black gives up!\n" : "White gives up!\n");
+                    printf(givingUp == black ? "White wins!\n" : "Black wins!\n");
+                    exit(0);
+                }
+                else if (tolower(giveUp) == 'n')
+                    break;
+            }
+            printColorText("Canceled! Continue playing...\nChoose the piece/coord to move\n", GREEN);
+            break;
+        }
+    }
+}
+
+/**
+ * Returns the winner, if there is one
+ * @param {PieceList *} pieceList - all pieces in game
+ * @returns {Team} the team that won or none
+ */
+Team isGameOver(PieceList *pieceList)
+{
+    int whitePieces = 0, blackPieces = 0;
+    while (pieceList)
+    {
+        if (pieceList->piece.team == white)
+            whitePieces++;
+        if (pieceList->piece.team == black)
+            blackPieces++;
+        pieceList = pieceList->next;
+    }
+    if (whitePieces != 0 && blackPieces != 0)
+        return none;
+    return whitePieces == 0 ? black : white;
+}
+
 #endif // HELPERS

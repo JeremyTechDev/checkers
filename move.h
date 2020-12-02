@@ -5,13 +5,13 @@
 #include "piece.h"
 #include "coord.h"
 
-void insertMove(MoveList **, Move, Piece *);
 int isMovePossible(PieceList *, Coord);
-MoveList *getPossibleMoves(PieceList *, Piece);
 Move *getKillingMove(PieceList *, Piece, int, int);
-MoveList *checkIfKillingMoves(PieceList *, Team);
-MoveList *pieceHasKillingMoves(PieceList *, Piece);
 Move *isMoveInList(CoordList *, int, int);
+MoveList *checkIfKillingMoves(PieceList *, Team);
+MoveList *getPossibleMoves(PieceList *, Piece);
+MoveList *pieceHasKillingMoves(PieceList *, Piece);
+void insertMove(MoveList **, Move, Piece *);
 
 /**
  * Inserts a move into the move list
@@ -73,7 +73,6 @@ MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
     Piece *piecesAtMovingPos[4] = {pieceAtPosMove1, pieceAtPosMove2, pieceAtPosMove3, pieceAtPosMove4};
 
     for (int i = 0; i < 3; i++)
-    {
         if ((*(piecesAtMovingPos + i)) && (*(piecesAtMovingPos + i))->team != piece.team)
         {
             int increment = i % 2 == 0 ? 1 : -1; // switch between 1 and -1
@@ -84,17 +83,14 @@ MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
             if (killingMove)
                 insertMove(&possibleMoves, *killingMove, &piece);
         }
-    }
 
     if (!possibleMoves) // If no possible moves at this point, there are no killing moves
-    {
         for (int i = 0; i < 3; i++)
         {
             Move move = {(*(posMoves + i)), NULL, -1};
             if (isMovePossible(pieceList, (*(posMoves + i))))
                 insertMove(&possibleMoves, move, NULL);
         }
-    }
     return possibleMoves;
 }
 
