@@ -7,7 +7,6 @@
 
 int isQueen(Piece, Coord);
 Piece *getPieceAtPosition(PieceList *, int, int);
-Piece getPieceToMove(PieceList *, Team);
 PieceList *initializePieces();
 void insertPiece(PieceList **, Piece);
 void modifyPiece(PieceList **, int, Piece);

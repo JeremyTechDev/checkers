@@ -2,3 +2,5 @@ main
 *.out
 /python
 .vscode
+*.dat
+idea.txt

@@ -4,6 +4,7 @@
 typedef char Board[8][8][4];
 
 const char *validLetters = "ABCDEFGH";
+const char *PLAYERS_RECORD_FILE = "players.dat";
 
 typedef enum Team
 {
@@ -11,6 +12,13 @@ typedef enum Team
     white,
     none,
 } Team;
+
+typedef enum MatchState
+{
+    lose,
+    win,
+    tie
+} MatchState;
 
 typedef enum Color
 {
@@ -21,6 +29,26 @@ typedef enum Color
     orange,
     purple,
 } Color;
+
+typedef struct Player
+{
+    char name[100];
+    Team team;
+} Player;
+
+typedef struct PlayerMatch
+{
+    Player player;
+    MatchState matchState;
+} PlayerMatch;
+
+typedef struct PlayerRecord
+{
+    Player player;
+    int wins;
+    int loses;
+    int ties;
+} PlayerRecord;
 
 typedef struct Coord
 {

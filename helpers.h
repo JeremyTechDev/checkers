@@ -1,6 +1,8 @@
 #if !defined(HELPERS)
 #define HELPERS
 
+#include "file.h"
+
 const char REGULAR[15] = "[0m";       // code 0
 const char GREEN[15] = "[1m\033[32m"; // code 1
 const char BLUE[15] = "[1m\033[36m";  // code 2
@@ -10,7 +12,7 @@ const char PURPLE[15] = "[1;35m";     // code 5
 
 Team isGameOver(PieceList *);
 void clear(int);
-void endGame(Team);
+void endGame(Team, Player, Player);
 void printColorText(const char *, const char *);
 void setColor(const char *);
 void setHighlightColor(Color);
@@ -73,7 +75,7 @@ void clear(int wait)
  * Check whether the user want to give up or ask to draw
  * @param {Team} givingUp - the team that wants to end the game
  */
-void endGame(Team givingUp)
+void endGame(Team givingUp, Player pl1, Player pl2)
 {
     char giveUp, option;
     printColorText("Ask to draw (D) or give up (G)?\n", RED);
@@ -96,6 +98,8 @@ void endGame(Team givingUp)
                 if (tolower(giveUp) == 'y')
                 {
                     printf("Match end with a draw!\n");
+                    savePlayerToFile(pl1, tie);
+                    savePlayerToFile(pl2, tie);
                     exit(0);
                 }
                 break;
@@ -116,6 +120,8 @@ void endGame(Team givingUp)
                 {
                     printf(givingUp == black ? "Black gives up!\n" : "White gives up!\n");
                     printf(givingUp == black ? "White wins!\n" : "Black wins!\n");
+                    savePlayerToFile(pl1.team == givingUp ? pl1 : pl2, lose);
+                    savePlayerToFile(pl2.team == givingUp ? pl1 : pl2, win);
                     exit(0);
                 }
                 else if (tolower(giveUp) == 'n')

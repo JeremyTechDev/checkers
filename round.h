@@ -1,23 +1,22 @@
 #if !defined(ROUND)
 #define ROUND
 
-MoveList *getRoundMoves(PieceList *, Piece *, Team);
-Piece getPieceToMove(PieceList *, Team);
-void handleKill(PieceList **, int, Piece);
-void handleMultipleKill(PieceList *, Piece);
-void runRound(Team, PieceList *);
+MoveList *getRoundMoves(PieceList *, Piece *, Player, Player);
+Piece getPieceToMove(PieceList *, Team, Player, Player);
+void handleKill(PieceList **, int, Piece, Player, Player);
+void runRound(Player, Player, PieceList *);
 
 /**
  * Runs a full round for one team
  * @param {Team} team - team playing in the round
  * @param {PieceList *} pieceList - all pieces in the game
  */
-void runRound(Team team, PieceList *pieceList)
+void runRound(Player player, Player opponent, PieceList *pieceList)
 {
-    printRoundInfo(team, pieceList, NULL);
+    printRoundInfo(player, pieceList, NULL);
     printColorText("Choose the piece you want to move: ", BLUE);
     Piece pieceToMove;
-    MoveList *possibleMoves = getRoundMoves(pieceList, &pieceToMove, team);
+    MoveList *possibleMoves = getRoundMoves(pieceList, &pieceToMove, player, opponent);
 
     while (1)
     {
@@ -26,15 +25,15 @@ void runRound(Team team, PieceList *pieceList)
         {
             moveChoice = getCoordsFromUser();
             if (!moveChoice)
-                endGame(team);
+                endGame(player.team, player, opponent);
         }
 
         Move *isMoveValid = isMoveInList(possibleMoves, (*moveChoice).x, (*moveChoice).y);
         if (isMoveValid)
         {
-            Piece newPiece = {pieceToMove.id, {(*moveChoice).x, (*moveChoice).y}, team, isQueen(pieceToMove, (*moveChoice)), 1};
+            Piece newPiece = {pieceToMove.id, {(*moveChoice).x, (*moveChoice).y}, player.team, isQueen(pieceToMove, (*moveChoice)), 1};
             modifyPiece(&pieceList, pieceToMove.id, newPiece);
-            handleKill(&pieceList, isMoveValid->killedPieceId, newPiece);
+            handleKill(&pieceList, isMoveValid->killedPieceId, newPiece, player, opponent);
             break;
         }
         else
@@ -43,54 +42,47 @@ void runRound(Team team, PieceList *pieceList)
 }
 
 /**
- * Kills a piece
+ * Kills a piece and handles if more kills can be done
  * @param {PieceList **} pieceList - all pieces in game
  * @param {int} killedPieceId - the id of the piece to kill, -1 to kill no piece 
  * @param {Piece} killingPiece - the piece making the kill
+ * @param {Player} player - the player of the round
  */
-void handleKill(PieceList **pieceList, int killedPieceId, Piece killingPiece)
+void handleKill(PieceList **pieceList, int killedPieceId, Piece killingPiece, Player player, Player opponent)
 {
     if (killedPieceId != -1)
     {
         Piece killedPiece = {killedPieceId, {0, 0, regular}, none, 0, 0};
         modifyPiece(pieceList, killedPieceId, killedPiece);
-        handleMultipleKill(*pieceList, killingPiece);
-    }
-}
 
-/**
- * Check and runs if its possible to make a multiple kill movement
- * @param {PieceList *} pieceList - all pieces in game
- * @param {Piece} killingPiece - the piece making the kills
- */
-void handleMultipleKill(PieceList *pieceList, Piece killingPiece)
-{
-    MoveList *hasMoreKillingMoves = pieceHasKillingMoves(pieceList, killingPiece);
-    while (hasMoreKillingMoves)
-    {
-        MoveList *possibleMoves = getRoundMoves(pieceList, &killingPiece, killingPiece.team);
-        Coord *moveChoice = NULL;
-
-        while (!moveChoice)
+        // handle multiple kills
+        MoveList *hasMoreKillingMoves = pieceHasKillingMoves(*pieceList, killingPiece);
+        while (hasMoreKillingMoves)
         {
-            moveChoice = getCoordsFromUser();
-            if (!moveChoice)
-                endGame(killingPiece.team);
+            MoveList *possibleMoves = getRoundMoves(*pieceList, &killingPiece, player, opponent);
+            Coord *moveChoice = NULL;
+
+            while (!moveChoice)
+            {
+                moveChoice = getCoordsFromUser();
+                if (!moveChoice)
+                    endGame(killingPiece.team, player, opponent);
+            }
+
+            Move *isMoveValid = isMoveInList(possibleMoves, (*moveChoice).x, (*moveChoice).y);
+            if (isMoveValid)
+            {
+                killingPiece = {killingPiece.id, {(*moveChoice).x, (*moveChoice).y}, killingPiece.team, isQueen(killingPiece, (*moveChoice)), 1};
+                modifyPiece(pieceList, killingPiece.id, killingPiece); // move to killing coord
+
+                Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, none, 0, 0};
+                modifyPiece(pieceList, isMoveValid->killedPieceId, killedPiece); // remove killed from game
+
+                hasMoreKillingMoves = pieceHasKillingMoves(*pieceList, killingPiece); // re-check for more kills
+            }
+            else
+                printColorText("That's not a possible move, try another one", RED);
         }
-
-        Move *isMoveValid = isMoveInList(possibleMoves, (*moveChoice).x, (*moveChoice).y);
-        if (isMoveValid)
-        {
-            killingPiece = {killingPiece.id, {(*moveChoice).x, (*moveChoice).y}, killingPiece.team, isQueen(killingPiece, (*moveChoice)), 1};
-            modifyPiece(&pieceList, killingPiece.id, killingPiece); // move to killing coord
-
-            Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, none, 0, 0};
-            modifyPiece(&pieceList, isMoveValid->killedPieceId, killedPiece); // remove killed from game
-
-            hasMoreKillingMoves = pieceHasKillingMoves(pieceList, killingPiece); // re-check for more kills
-        }
-        else
-            printColorText("That's not a possible move, try another one", RED);
     }
 }
 
@@ -101,10 +93,10 @@ void handleMultipleKill(PieceList *pieceList, Piece killingPiece)
  * @param {Team} team - team's round
  * @returns {MoveList *} all the possible moves or NULL
  */
-MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Team team)
+MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Player player, Player opponent)
 {
     int i = 0;
-    MoveList *possibleMoves = checkIfKillingMoves(pieceList, team);
+    MoveList *possibleMoves = checkIfKillingMoves(pieceList, player.team);
     if (possibleMoves)
         *pieceToMove = *possibleMoves->move.killingPiece;
     else
@@ -112,7 +104,7 @@ MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Team team)
         {
             if (i++)
                 printColorText("No possible moves for that piece, try another one: \a", RED);
-            *pieceToMove = getPieceToMove(pieceList, team);
+            *pieceToMove = getPieceToMove(pieceList, player.team, player, opponent);
             possibleMoves = getPossibleMoves(pieceList, *pieceToMove);
         }
 
@@ -120,7 +112,7 @@ MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Team team)
     insertMove(&toHighlight, {pieceToMove->coord, pieceToMove, -1}, NULL);
 
     system("clear");
-    printRoundInfo(team, pieceList, toHighlight);
+    printRoundInfo(player, pieceList, toHighlight);
     printTextCoord(possibleMoves);
     return possibleMoves;
 }
@@ -130,7 +122,7 @@ MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Team team)
  * @param {PieceList **} pieceList - all pieces in game
  * @param {Team} team - team's round
  */
-Piece getPieceToMove(PieceList *pieceList, Team team)
+Piece getPieceToMove(PieceList *pieceList, Team team, Player player, Player opponent)
 {
     Coord *pieceChoice = NULL;
     Piece *pieceToMove = NULL;
@@ -141,7 +133,7 @@ Piece getPieceToMove(PieceList *pieceList, Team team)
         {
             pieceChoice = getCoordsFromUser();
             if (!pieceChoice)
-                endGame(team);
+                endGame(team, player, opponent);
         }
         pieceToMove = getPieceAtPosition(pieceList, (*pieceChoice).x, (*pieceChoice).y);
         if (pieceToMove)

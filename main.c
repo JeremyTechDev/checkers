@@ -8,23 +8,31 @@
 #include "piece.h"
 #include "move.h"
 #include "round.h"
+#include "file.h"
 
 int main(int argc, char const *argv[])
 {
-    Team currentRoundTeam = black, winner;
+    Player player1 = {"Jeremy", black}, player2 = {"Messi", white}, currPlayer = player1;
     PieceList *pieceList = initializePieces();
+    Team winner;
+
+    readPlayersFile();
+    clear(1);
 
     while (1)
     {
-        runRound(currentRoundTeam, pieceList);
+        runRound(currPlayer, currPlayer.team == player1.team ? player2 : player1, pieceList);
         winner = isGameOver(pieceList);
         if (winner != none)
         {
-            printf("Game over!\n%s", winner == black ? "Black wins!\n" : "White wins!\n");
+            printColorText("Game Over!\n", GREEN);
+            printColorText(winner == black ? "Black wins!\n" : "White wins!\n", GREEN);
+            savePlayerToFile(winner == black ? player1 : player2, win);
+            savePlayerToFile(winner == black ? player2 : player1, lose);
             exit(0);
         }
         clear(0);
-        currentRoundTeam = currentRoundTeam == black ? white : black;
+        currPlayer = currPlayer.team == black ? player2 : player1;
     }
 
     return 0;
