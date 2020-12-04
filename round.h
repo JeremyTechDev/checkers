@@ -1,6 +1,8 @@
 #if !defined(ROUND)
 #define ROUND
 
+#include "file.h"
+
 MoveList *getRoundMoves(PieceList *, Piece *, Player, Player);
 Piece getPieceToMove(PieceList *, Team, Player, Player);
 void handleKill(PieceList **, int, Piece, Player, Player);
@@ -33,6 +35,7 @@ void runRound(Player player, Player opponent, PieceList *pieceList)
         {
             Piece newPiece = {pieceToMove.id, {(*moveChoice).x, (*moveChoice).y}, player.team, isQueen(pieceToMove, (*moveChoice)), 1};
             modifyPiece(&pieceList, pieceToMove.id, newPiece);
+            saveMatchStepToFile(player, *moveChoice, isMoveValid->coord);
             handleKill(&pieceList, isMoveValid->killedPieceId, newPiece, player, opponent);
             break;
         }
@@ -74,6 +77,7 @@ void handleKill(PieceList **pieceList, int killedPieceId, Piece killingPiece, Pl
             {
                 killingPiece = {killingPiece.id, {(*moveChoice).x, (*moveChoice).y}, killingPiece.team, isQueen(killingPiece, (*moveChoice)), 1};
                 modifyPiece(pieceList, killingPiece.id, killingPiece); // move to killing coord
+                saveMatchStepToFile(player, *moveChoice, isMoveValid->coord);
 
                 Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, none, 0, 0};
                 modifyPiece(pieceList, isMoveValid->killedPieceId, killedPiece); // remove killed from game

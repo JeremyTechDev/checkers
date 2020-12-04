@@ -5,14 +5,28 @@
 #include <stdlib.h>
 #include <string.h>
 #include "structs.h"
-// #include "helpers.h"
 
 // Function declarations
 FILE *openFile(const char *, const char *);
 void closeFile(FILE *);
 void readPlayersFile();
 void savePlayerToFile(Player, MatchState);
+void saveMatchStepToFile(Player, Coord, Coord);
 int countPlayersInFile();
+char *formatCoord(Coord);
+
+/**
+ * Converts a [x,y] coord to @# text
+ * @param {Coord} coord - the coord to convert to text
+ * @returns {char *} the text value of coord
+ */
+char *formatCoord(Coord coord)
+{
+    char *result = (char *)malloc(sizeof(char) * 3);
+    *(result) = (char)validLetters[coord.y];
+    *(result + 1) = (char)((coord.x + 1) + '0');
+    return result;
+}
 
 /**
  * Opens a file
@@ -48,9 +62,23 @@ void closeFile(FILE *file)
  */
 void savePlayerToFile(Player player, MatchState matchState)
 {
-    FILE *file = openFile(PLAYERS_RECORD_FILE, "a+b");
     PlayerMatch match = {player, matchState};
+    FILE *file = openFile(PLAYERS_RECORD_FILE, "a+b");
     fwrite(&match, sizeof(PlayerMatch), 1, file);
+    closeFile(file);
+}
+
+void saveMatchStepToFile(Player player, Coord from, Coord to)
+{
+    char toSave[150];
+    strcat(toSave, player.name);
+    strcat(toSave, " moved from ");
+    strcat(toSave, formatCoord(from));
+    strcat(toSave, " to ");
+    strcat(toSave, formatCoord(to));
+
+    FILE *file = openFile(MATCH_STEP_FILE, "a+b");
+    fwrite(&toSave, sizeof(char), 150, file);
     closeFile(file);
 }
 
@@ -60,7 +88,7 @@ void savePlayerToFile(Player player, MatchState matchState)
  */
 int countPlayersInFile()
 {
-    FILE *file = openFile(PLAYERS_RECORD_FILE, "rb");
+    FILE *file = openFile(PLAYERS_RECORD_FILE, "a+");
     fseek(file, 0L, SEEK_END);
     int playersCount = ftell(file) / sizeof(PlayerMatch);
     closeFile(file);

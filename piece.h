@@ -22,14 +22,14 @@ PieceList *initializePieces()
 
     Piece p1 = {1, {4, 3, regular}, black, 0, 1};
     Piece p2 = {2, {3, 2, regular}, white, 0, 1};
-    Piece p3 = {3, {1, 2, regular}, white, 0, 1};
-    Piece p4 = {4, {1, 4, regular}, white, 0, 1};
+    // Piece p3 = {3, {1, 2, regular}, white, 0, 1};
+    // Piece p4 = {4, {1, 4, regular}, white, 0, 1};
     // Piece p5 = {5, {6, 1, regular}, white, 0, 1};
 
     insertPiece(&pieceList, p1);
     insertPiece(&pieceList, p2);
-    insertPiece(&pieceList, p3);
-    insertPiece(&pieceList, p4);
+    // insertPiece(&pieceList, p3);
+    // insertPiece(&pieceList, p4);
     // insertPiece(&pieceList, p5);
 
     // white pieces
