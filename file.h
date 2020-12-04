@@ -69,20 +69,6 @@ void savePlayerToFile(Player player, MatchState matchState)
     closeFile(file);
 }
 
-void saveMatchStepToFile(Player player, Coord from, Coord to)
-{
-    char toSave[150];
-    strcat(toSave, player.name);
-    strcat(toSave, " moved from ");
-    strcat(toSave, formatCoord(from));
-    strcat(toSave, " to ");
-    strcat(toSave, formatCoord(to));
-
-    FILE *file = openFile(MATCH_STEP_FILE, "a+b");
-    fwrite(&toSave, sizeof(char), 150, file);
-    closeFile(file);
-}
-
 /**
  * Saves a match step to the matches file
  * @param {Player} player - the player to save
