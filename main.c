@@ -17,6 +17,7 @@ int main(int argc, char const *argv[])
     Team winner;
 
     readPlayersFile();
+    readMatchStepsFile();
     clear(1);
 
     while (1)

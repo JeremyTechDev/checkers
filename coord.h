@@ -14,7 +14,7 @@ int isMovePossible(PieceList *, Coord);
 Coord *getCoordsFromUser()
 {
     int xCord, yCord;
-    char input[10];
+    char input[10] = {'\0'};
 
     while (1)
     {
@@ -85,6 +85,7 @@ char *convertCoordToText(Coord coord)
     char *result = (char *)malloc(sizeof(char) * 3);
     *(result) = (char)validLetters[coord.y];
     *(result + 1) = (char)((coord.x + 1) + '0');
+    *(result + 2) = '\0';
     return result;
 }
 

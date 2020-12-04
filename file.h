@@ -12,7 +12,7 @@ void closeFile(FILE *);
 void readPlayersFile();
 void readMatchStepsFile();
 void savePlayerToFile(Player, MatchState);
-void saveMatchStepToFile(Player, Coord, Coord);
+void saveMatchStepToFile(Player, Coord *, Coord, int);
 int countPlayersInFile();
 char *formatCoord(Coord);
 
@@ -26,6 +26,7 @@ char *formatCoord(Coord coord)
     char *result = (char *)malloc(sizeof(char) * 3);
     *(result) = (char)validLetters[coord.y];
     *(result + 1) = (char)((coord.x + 1) + '0');
+    *(result + 2) = {'\0'};
     return result;
 }
 
@@ -75,14 +76,28 @@ void savePlayerToFile(Player player, MatchState matchState)
  * @param {Cord} from - moved from coord
  * @param {Cord} to - moved to coord
  */
-void saveMatchStepToFile(Player player, Coord from, Coord to)
+void saveMatchStepToFile(Player player, Coord *from, Coord to, int kill)
 {
-    char toSave[150];
+    char toSave[150] = {'\0'};
     strcat(toSave, player.name);
-    strcat(toSave, " moved from ");
-    strcat(toSave, formatCoord(from));
-    strcat(toSave, " to ");
-    strcat(toSave, formatCoord(to));
+    strcat(toSave, " (");
+    strcat(toSave, player.team == black ? "black" : "white");
+    strcat(toSave, ") ");
+    if (kill)
+    {
+        strcat(toSave, "killed at ");
+        strcat(toSave, formatCoord(to));
+    }
+    else
+    {
+        strcat(toSave, "moved from ");
+        strcat(toSave, formatCoord(*from));
+        strcat(toSave, " to ");
+        strcat(toSave, formatCoord(to));
+    }
+    strcat(toSave, " (");
+    strcat(toSave, player.team == black ? "white" : "black");
+    strcat(toSave, ") ");
     strcat(toSave, "\0");
 
     FILE *file = openFile(MATCH_STEP_FILE, "a+b");
@@ -162,7 +177,7 @@ void readPlayersFile()
 // Reads and prints all the match steps in the file
 void readMatchStepsFile()
 {
-    char tmp[150];
+    char tmp[150] = {'\0'};
     int matchStepsCount = countMatchStepInFile(), read = 0, count = 0;
     FILE *file = openFile(MATCH_STEP_FILE, "rb");
 
@@ -170,6 +185,8 @@ void readMatchStepsFile()
     {
         fread(&tmp, (sizeof(char) * 150), 1, file);
         fputs(tmp, stdout);
+        printf("\n");
+        read++;
     }
     closeFile(file);
 }
