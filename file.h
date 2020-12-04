@@ -14,10 +14,9 @@ void readMatchStepsFile();
 void savePlayerToFile(Player, MatchState);
 void saveMatchStepToFile(Player, Coord, Coord);
 int countPlayersInFile();
-int countMatchStepInFile();
 char *formatCoord(Coord);
 
-/**
+/*
  * Converts a [x,y] coord to @# text
  * @param {Coord} coord - the coord to convert to text
  * @returns {char *} the text value of coord
@@ -67,6 +66,20 @@ void savePlayerToFile(Player player, MatchState matchState)
     PlayerMatch match = {player, matchState};
     FILE *file = openFile(PLAYERS_RECORD_FILE, "a+b");
     fwrite(&match, sizeof(PlayerMatch), 1, file);
+    closeFile(file);
+}
+
+void saveMatchStepToFile(Player player, Coord from, Coord to)
+{
+    char toSave[150];
+    strcat(toSave, player.name);
+    strcat(toSave, " moved from ");
+    strcat(toSave, formatCoord(from));
+    strcat(toSave, " to ");
+    strcat(toSave, formatCoord(to));
+
+    FILE *file = openFile(MATCH_STEP_FILE, "a+b");
+    fwrite(&toSave, sizeof(char), 150, file);
     closeFile(file);
 }
 
