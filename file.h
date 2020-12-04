@@ -10,9 +10,11 @@
 FILE *openFile(const char *, const char *);
 void closeFile(FILE *);
 void readPlayersFile();
+void readMatchStepsFile();
 void savePlayerToFile(Player, MatchState);
 void saveMatchStepToFile(Player, Coord, Coord);
 int countPlayersInFile();
+int countMatchStepInFile();
 char *formatCoord(Coord);
 
 /**
@@ -68,6 +70,12 @@ void savePlayerToFile(Player player, MatchState matchState)
     closeFile(file);
 }
 
+/**
+ * Saves a match step to the matches file
+ * @param {Player} player - the player to save
+ * @param {Cord} from - moved from coord
+ * @param {Cord} to - moved to coord
+ */
 void saveMatchStepToFile(Player player, Coord from, Coord to)
 {
     char toSave[150];
@@ -76,6 +84,7 @@ void saveMatchStepToFile(Player player, Coord from, Coord to)
     strcat(toSave, formatCoord(from));
     strcat(toSave, " to ");
     strcat(toSave, formatCoord(to));
+    strcat(toSave, "\0");
 
     FILE *file = openFile(MATCH_STEP_FILE, "a+b");
     fwrite(&toSave, sizeof(char), 150, file);
@@ -93,6 +102,19 @@ int countPlayersInFile()
     int playersCount = ftell(file) / sizeof(PlayerMatch);
     closeFile(file);
     return playersCount;
+}
+
+/**
+ * Counts the amount of match steps in the file
+ * @returns {int} the amount of players
+ */
+int countMatchStepInFile()
+{
+    FILE *file = openFile(MATCH_STEP_FILE, "a+");
+    fseek(file, 0L, SEEK_END);
+    int matchSteps = ftell(file) / (sizeof(char) * 150);
+    closeFile(file);
+    return matchSteps;
 }
 
 // Reads and prints all the players so far with their stats
@@ -136,6 +158,21 @@ void readPlayersFile()
 
     for (int i = 0; i < count; i++)
         printf("Name: %s - Team: %s - Wins: %d - Loses: %d - Ties: %d \n", (playersRecords + i)->player.name, (playersRecords + i)->player.team == black ? "Black" : "white", (playersRecords + i)->wins, (playersRecords + i)->loses, (playersRecords + i)->ties);
+}
+
+// Reads and prints all the match steps in the file
+void readMatchStepsFile()
+{
+    char tmp[150];
+    int matchStepsCount = countMatchStepInFile(), read = 0, count = 0;
+    FILE *file = openFile(MATCH_STEP_FILE, "rb");
+
+    while (read < matchStepsCount)
+    {
+        fread(&tmp, (sizeof(char) * 150), 1, file);
+        fputs(tmp, stdout);
+    }
+    closeFile(file);
 }
 
 #endif // FILES
