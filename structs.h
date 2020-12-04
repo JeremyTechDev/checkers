@@ -5,6 +5,7 @@ typedef char Board[8][8][4];
 
 const char *validLetters = "ABCDEFGH";
 const char *PLAYERS_RECORD_FILE = "players.dat";
+const char *MATCH_STEP_FILE = "matches.dat";
 
 typedef enum Team
 {
