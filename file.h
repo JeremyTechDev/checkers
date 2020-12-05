@@ -14,6 +14,7 @@ void readMatchStepsFile();
 void savePlayerToFile(Player, MatchState);
 void saveMatchStepToFile(Player, Coord *, Coord, int);
 int countPlayersInFile();
+int comparePlayersRecord(const void *, const void *);
 char *formatCoord(Coord);
 
 /*
@@ -131,6 +132,19 @@ int countMatchStepInFile()
     return matchSteps;
 }
 
+/**
+ * Compares to sort a PlayerRecords list by wins
+ * @param {const void *} - the first value to compare 
+ * @param {const void *} - the second value to compare 
+ * @returns {int} - the result of the comparatation 
+ */
+int comparePlayersRecord(const void *valueA, const void *valueB)
+{
+    PlayerRecord *player1 = (PlayerRecord *)valueA;
+    PlayerRecord *player2 = (PlayerRecord *)valueB;
+    return player2->wins - player1->wins;
+}
+
 // Reads and prints all the players so far with their stats
 void readPlayersFile()
 {
@@ -139,6 +153,8 @@ void readPlayersFile()
     int playersCount = countPlayersInFile(), read = 0, saved, count = 0;
     FILE *file = openFile(PLAYERS_RECORD_FILE, "rb");
 
+    if (playersCount == 0)
+        printf("Sorry, there are no players records to show!");
     while (read < playersCount)
     {
         saved = 0;
@@ -170,8 +186,9 @@ void readPlayersFile()
     }
     closeFile(file);
 
+    qsort(playersRecords, count, sizeof(PlayerRecord), comparePlayersRecord);
     for (int i = 0; i < count; i++)
-        printf("Name: %s - Team: %s - Wins: %d - Loses: %d - Ties: %d \n", (playersRecords + i)->player.name, (playersRecords + i)->player.team == black ? "Black" : "white", (playersRecords + i)->wins, (playersRecords + i)->loses, (playersRecords + i)->ties);
+        printf(">>> %d: %s (%s)\t\tWins: %d \tLoses: %d \tTies: %d\n", i + 1, (playersRecords + i)->player.name, (playersRecords + i)->player.team == black ? "Black" : "White", (playersRecords + i)->wins, (playersRecords + i)->loses, (playersRecords + i)->ties);
 }
 
 // Reads and prints all the match steps in the file
@@ -181,6 +198,8 @@ void readMatchStepsFile()
     int matchStepsCount = countMatchStepInFile(), read = 0, count = 0;
     FILE *file = openFile(MATCH_STEP_FILE, "rb");
 
+    if (matchStepsCount == 0)
+        printf("Sorry, there are no matches to show!");
     while (read < matchStepsCount)
     {
         fread(&tmp, (sizeof(char) * 150), 1, file);
@@ -188,6 +207,7 @@ void readMatchStepsFile()
         printf("\n");
         read++;
     }
+    printf("\n\n");
     closeFile(file);
 }
 

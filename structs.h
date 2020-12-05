@@ -33,7 +33,7 @@ typedef enum Color
 
 typedef struct Player
 {
-    char name[100];
+    char name[50];
     Team team;
 } Player;
 

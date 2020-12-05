@@ -16,6 +16,36 @@ void endGame(Team, Player, Player);
 void printColorText(const char *, const char *);
 void setColor(const char *);
 void setHighlightColor(Color);
+int getInt(int, int);
+void clearFflush();
+
+// Removes all the extra \n in the stdin
+void clearFflush()
+{
+    while (getchar() != '\n') // To consume `\n`
+        printf("\n");
+}
+
+/**
+ * Gets and returns an int value within a range
+ * @param {int} bottomLimit - the min value of the range
+ * @param {int} topLimit - the max value of the range
+ * @returns {int} an int value within the given range
+ */
+int getInt(int bottomLimit, int topLimit)
+{
+    int input, attempts = 0;
+    do
+    {
+        if (attempts != 0)
+            printColorText("Invalid input! Try again: ", RED);
+
+        scanf(" %d", &input);
+        clearFflush();
+        attempts++;
+    } while (topLimit != -1 ? (input < bottomLimit) || (input > topLimit) : (input < bottomLimit));
+    return input;
+}
 
 /**
  * Print a text with a given color
@@ -65,8 +95,8 @@ void clear(int wait)
     if (wait)
     {
         printColorText("\nPress ENTER to continue\n", BLUE);
-        fflush(stdin);
         getchar();
+        clearFflush();
     }
     system("clear");
 }
