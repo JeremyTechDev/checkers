@@ -76,6 +76,10 @@ Player getPlayer(Team team)
     fgets(name, sizeof(name), stdin);
     setColor(REGULAR);
 
+    for (int i = 0; name[i] != '\0'; i++) // remove the \n
+        if (name[i] == '\n')
+            name[i] = 0;
+
     strcpy(player.name, name);
     player.team = team;
     printf("\n");

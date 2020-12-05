@@ -96,7 +96,7 @@ void clear(int wait)
     {
         printColorText("\nPress ENTER to continue\n", BLUE);
         getchar();
-        clearFflush();
+        fflush(stdin);
     }
     system("clear");
 }

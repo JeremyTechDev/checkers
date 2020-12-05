@@ -149,7 +149,7 @@ int comparePlayersRecord(const void *valueA, const void *valueB)
 void readPlayersFile()
 {
     PlayerMatch tmp;
-    PlayerRecord *playersRecords = (PlayerRecord *)malloc(0);
+    PlayerRecord *playersRecords = (PlayerRecord *)malloc(sizeof(PlayerRecord));
     int playersCount = countPlayersInFile(), read = 0, saved, count = 0;
     FILE *file = openFile(PLAYERS_RECORD_FILE, "rb");
 
@@ -184,11 +184,11 @@ void readPlayersFile()
         }
         read++;
     }
-    closeFile(file);
 
     qsort(playersRecords, count, sizeof(PlayerRecord), comparePlayersRecord);
     for (int i = 0; i < count; i++)
         printf(">>> %d: %s (%s)\t\tWins: %d \tLoses: %d \tTies: %d\n", i + 1, (playersRecords + i)->player.name, (playersRecords + i)->player.team == black ? "Black" : "White", (playersRecords + i)->wins, (playersRecords + i)->loses, (playersRecords + i)->ties);
+    closeFile(file);
 }
 
 // Reads and prints all the match steps in the file
@@ -207,7 +207,6 @@ void readMatchStepsFile()
         printf("\n");
         read++;
     }
-    printf("\n\n");
     closeFile(file);
 }
 
