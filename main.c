@@ -39,6 +39,7 @@ void menu()
         clear(0);
         whitePlayer = getPlayer(white);
         blackPlayer = getPlayer(black);
+        clear(0);
         startGame(whitePlayer, blackPlayer);
         clear(1);
         break;

@@ -27,7 +27,7 @@ char *formatCoord(Coord coord)
     char *result = (char *)malloc(sizeof(char) * 3);
     *(result) = (char)validLetters[coord.y];
     *(result + 1) = (char)((coord.x + 1) + '0');
-    *(result + 2) = {'\0'};
+    *(result + 2) = '\0';
     return result;
 }
 
@@ -179,7 +179,7 @@ void readPlayersFile()
         if (!saved)
         {
             playersRecords = (PlayerRecord *)realloc(playersRecords, sizeof(PlayerRecord));
-            *(playersRecords + count) = {tmp.player, tmp.matchState == win ? 1 : 0, tmp.matchState == lose ? 1 : 0, tmp.matchState == tie ? 1 : 0};
+            *(playersRecords + count) = (PlayerRecord){tmp.player, tmp.matchState == win ? 1 : 0, tmp.matchState == lose ? 1 : 0, tmp.matchState == tie ? 1 : 0};
             count++;
         }
         read++;

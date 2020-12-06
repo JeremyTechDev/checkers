@@ -6,10 +6,10 @@ help:
 	@echo ""
 
 start:
-	clear & g++ -o main main.c && ./main
+	clear & gcc -o main main.c && ./main
 
 compile:
-	g++ -g main.c
+	clear & gcc -g main.c
 
 default:
 	help

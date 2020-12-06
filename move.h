@@ -7,7 +7,7 @@
 
 int isMovePossible(PieceList *, Coord);
 Move *getKillingMove(PieceList *, Piece, int, int);
-Move *isMoveInList(CoordList *, int, int);
+Move *isMoveInList(MoveList *, int, int);
 MoveList *checkIfKillingMoves(PieceList *, Team);
 MoveList *getPossibleMoves(PieceList *, Piece);
 MoveList *pieceHasKillingMoves(PieceList *, Piece);
@@ -53,18 +53,18 @@ void insertMove(MoveList **moveList, Move move, Piece *killingPiece)
 MoveList *getPossibleMoves(PieceList *pieceList, Piece piece)
 {
     MoveList *possibleMoves = NULL;
-    Coord posMove1, posMove2, posMove3, posMove4;
+    Coord posMove3, posMove4;
     Piece *pieceAtPosMove1 = NULL, *pieceAtPosMove2 = NULL, *pieceAtPosMove3 = NULL, *pieceAtPosMove4 = NULL;
 
-    posMove1 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y + 1, orange};
-    posMove2 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y - 1, orange};
+    Coord posMove1 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y + 1, orange};
+    Coord posMove2 = {piece.coord.x + (piece.team == black ? -1 : 1), piece.coord.y - 1, orange};
     pieceAtPosMove1 = getPieceAtPosition(pieceList, posMove1.x, posMove1.y);
     pieceAtPosMove2 = getPieceAtPosition(pieceList, posMove2.x, posMove2.y);
 
     if (piece.isQueen)
     {
-        posMove3 = {piece.coord.x + (piece.team == black ? 1 : -1), piece.coord.y + 1, orange};
-        posMove4 = {piece.coord.x + (piece.team == black ? 1 : -1), piece.coord.y - 1, orange};
+        posMove3 = (Coord){piece.coord.x + (piece.team == black ? 1 : -1), piece.coord.y + 1, orange};
+        posMove4 = (Coord){piece.coord.x + (piece.team == black ? 1 : -1), piece.coord.y - 1, orange};
         pieceAtPosMove3 = getPieceAtPosition(pieceList, posMove3.x, posMove3.y);
         pieceAtPosMove4 = getPieceAtPosition(pieceList, posMove4.x, posMove4.y);
     }
@@ -110,7 +110,7 @@ Move *getKillingMove(PieceList *pieceList, Piece piece, int increment, int xIncr
 
     if (!getPieceAtPosition(pieceList, x, y))
     {
-        move->coord = {x, y, red};
+        move->coord = (Coord){x, y, red};
         move->killedPieceId = piece.id;
         move->killingPiece = NULL;
         if (isMovePossible(pieceList, move->coord))

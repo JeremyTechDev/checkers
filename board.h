@@ -29,9 +29,9 @@ void printBoard(PieceList *pieceList, MoveList *coordsToHighlight)
         {
             Move *hasHighlight = isMoveInList(coordsToHighlight, x, y);
             if (coordsToHighlight && hasHighlight)
-                printSpot(pieceList, {x, y, hasHighlight->coord.colorCode});
+                printSpot(pieceList, (Coord){x, y, hasHighlight->coord.colorCode});
             else
-                printSpot(pieceList, {x, y, regular});
+                printSpot(pieceList, (Coord){x, y, regular});
         }
         printf("\n");
     }

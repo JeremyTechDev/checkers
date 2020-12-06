@@ -76,7 +76,7 @@ void handleKill(PieceList **pieceList, int killedPieceId, Piece killingPiece, Pl
             Move *isMoveValid = isMoveInList(possibleMoves, (*moveChoice).x, (*moveChoice).y);
             if (isMoveValid)
             {
-                killingPiece = {killingPiece.id, {(*moveChoice).x, (*moveChoice).y}, killingPiece.team, isQueen(killingPiece, (*moveChoice)), 1};
+                killingPiece = (Piece){killingPiece.id, (Coord){(*moveChoice).x, (*moveChoice).y, regular}, killingPiece.team, isQueen(killingPiece, (*moveChoice)), 1};
                 modifyPiece(pieceList, killingPiece.id, killingPiece); // move to killing coord
 
                 Piece killedPiece = {isMoveValid->killedPieceId, {0, 0, regular}, none, 0, 0};
@@ -114,7 +114,7 @@ MoveList *getRoundMoves(PieceList *pieceList, Piece *pieceToMove, Player player,
         }
 
     MoveList *toHighlight = possibleMoves; // insert the selected piece to highlight
-    insertMove(&toHighlight, {pieceToMove->coord, pieceToMove, -1}, NULL);
+    insertMove(&toHighlight, (Move){pieceToMove->coord, pieceToMove, -1}, NULL);
 
     system("clear");
     printRoundInfo(player, pieceList, toHighlight);
@@ -153,7 +153,10 @@ Piece getPieceToMove(PieceList *pieceList, Team team, Player player, Player oppo
             }
         }
         else
+        {
             printColorText("No piece at that coord, try another one: \a", RED);
+            pieceChoice = NULL;
+        }
     }
 }
 
