@@ -153,7 +153,10 @@ Piece getPieceToMove(PieceList *pieceList, Team team, Player player, Player oppo
         if (pieceToMove)
         {
             if (pieceToMove->team != team)
+            {
                 printColorText("That's not your piece, try another one: \a", RED);
+                pieceChoice = NULL;
+            }
             else
             {
                 Piece pieceToReturn = {pieceToMove->id, pieceToMove->coord, pieceToMove->team, pieceToMove->isQueen, pieceToMove->isOnGame};
