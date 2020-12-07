@@ -18,7 +18,8 @@ typedef enum MatchState
 {
     lose,
     win,
-    tie
+    tie,
+    inGame,
 } MatchState;
 
 typedef enum Color

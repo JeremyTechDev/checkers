@@ -94,14 +94,17 @@ Player getPlayer(Team team)
  */
 void startGame(Player whitePlayer, Player blackPlayer)
 {
-    Player currPlayer = whitePlayer;
+    MatchState round;
     PieceList *pieceList = initializePieces();
+    Player currPlayer = whitePlayer;
     Team winner;
 
     while (1)
     {
-        runRound(currPlayer, currPlayer.team == white ? blackPlayer : whitePlayer, pieceList);
+        round = runRound(currPlayer, currPlayer.team == white ? blackPlayer : whitePlayer, pieceList);
         winner = isGameOver(pieceList);
+        if (round != inGame)
+            break;
         if (winner != none)
         {
             printColorText("Game Over!\n", GREEN);

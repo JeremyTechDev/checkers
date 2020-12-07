@@ -12,7 +12,7 @@ const char PURPLE[15] = "[1;35m";     // code 5
 
 Team isGameOver(PieceList *);
 void clear(int);
-void endGame(Team, Player, Player);
+MatchState endGame(Team, Player, Player);
 void printColorText(const char *, const char *);
 void setColor(const char *);
 void setHighlightColor(Color);
@@ -104,8 +104,9 @@ void clear(int wait)
 /**
  * Check whether the user want to give up or ask to draw
  * @param {Team} givingUp - the team that wants to end the game
+ * @returns {MatchState} will be either tie, win or lose
  */
-void endGame(Team givingUp, Player pl1, Player pl2)
+MatchState endGame(Team givingUp, Player pl1, Player pl2)
 {
     char giveUp, option;
     printColorText("Ask to draw (D) or give up (G)?\n", RED);
@@ -130,7 +131,7 @@ void endGame(Team givingUp, Player pl1, Player pl2)
                     printf("Match end with a draw!\n");
                     savePlayerToFile(pl1, tie);
                     savePlayerToFile(pl2, tie);
-                    exit(0);
+                    return tie;
                 }
                 break;
             }
@@ -152,7 +153,7 @@ void endGame(Team givingUp, Player pl1, Player pl2)
                     printf(givingUp == black ? "White wins!\n" : "Black wins!\n");
                     savePlayerToFile(pl1.team == givingUp ? pl1 : pl2, lose);
                     savePlayerToFile(pl2.team == givingUp ? pl1 : pl2, win);
-                    exit(0);
+                    return lose;
                 }
                 else if (tolower(giveUp) == 'n')
                     break;
@@ -161,6 +162,7 @@ void endGame(Team givingUp, Player pl1, Player pl2)
             break;
         }
     }
+    return inGame;
 }
 
 /**
